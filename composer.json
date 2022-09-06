@@ -1,0 +1,15 @@
+{
+    "name": "volochaev/image_generation",
+    "autoload": {
+        "psr-4": {
+            "Volochaev\\ImageGeneration\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Волочаев Даниил",
+            "email": "volochaev@techart.ru"
+        }
+    ],
+    "require": {}
+}
