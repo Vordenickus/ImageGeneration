@@ -99,10 +99,12 @@ class Image
 
 	public function calculateLabel($x, $y, $width, $height, $classId)
 	{
-		$xMin = $x / $this->width;
-		$yMin = $y / $this->height;
-		$xMax = ($x + $width) / $this->width;
-		$yMax = ($y + $height) / $this->height;
+		$imageWidth = imagesx($this->image);
+		$imageHeigth = imagesy($this->image);
+		$xMin = ($x + $width / 2) / $imageWidth;
+		$yMin = ($y + $height / 2) / $imageHeigth;
+		$xMax = $width / $imageWidth;
+		$yMax = $height / $imageHeigth;
 		return "$classId $xMin $yMin $xMax $yMax";
 	}
 
