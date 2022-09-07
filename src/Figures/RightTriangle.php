@@ -32,7 +32,9 @@ class RightTriangle extends Figure
 		];
 
 		if ($this->filled) {
-			imagefilledpolygon($image,$points,3,$color);
+			imagefilledpolygon($image,$points, count($points) / 2,$color);
+			return;
 		}
+		imagepolygon($image, $points, count($points) / 2, $color);
 	}
 }

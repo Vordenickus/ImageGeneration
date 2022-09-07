@@ -30,6 +30,15 @@ class Circle extends Figure
 				$this->diameter,
 				$color
 			);
+			return;
 		}
+		imageellipse(
+			$image,
+			$this->x,
+			$this->y,
+			$this->diameter,
+			$this->diameter,
+			$color
+		);
 	}
 }
