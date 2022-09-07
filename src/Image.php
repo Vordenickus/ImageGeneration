@@ -2,6 +2,7 @@
 
 namespace Volochaev\ImageGeneration;
 
+use Volochaev\ImageGeneration\Figures\RightTriangle;
 use Volochaev\ImageGeneration\Figures\Square;
 
 use Volochaev\ImageGeneration\Helpers\HexToRGB;
@@ -14,7 +15,7 @@ class Image
 	protected $background;
 	protected $image;
 	protected $figures = [];
-	protected $rotateChance = 0;
+	protected $rotateChance = 20;
 	public $pivot;
 	protected $occupied = ['x' => [], 'y' => []];
 
@@ -28,14 +29,18 @@ class Image
 		
 		imagefill($this->image, 0, 0, $this->background);
 		$this->addPivots();
-		//$this->addFigure('f');
-		//$this->drawFigures();
+		$this->addFigure('f');
+		$this->drawFigures();
 	}
 
 	public function addFigure($figure)
 	{
-		for ($i = 0; $i < 20; $i++) {
-			$this->figures[] = Square::getRandomSquare(50, 512, 512, [0,0,0]);
+		for ($i = 0; $i < 6; $i++) {
+			$this->figures[] = $this->getRandomTriangle();
+		}
+
+		for ($i = 0; $i < 6; $i++) {
+			$this->figures[] = $this->getRandomSquare();
 		}
 	}
 
@@ -49,7 +54,7 @@ class Image
 			$x = $this->getRandomX($this->width - $sx);
 			$y = $this->getRandomY($this->width - $sy);
 			$this->addToOccupied($x, $y, $sx, $sy);
-			$tilt = rand(80, 100) / 100;
+			$tilt = rand(95, 100) / 100;
 			$this->pivot = $this->perspective($this->pivot, $tilt);
 			$stamp = $this->pivot;
 			$stamp = imagerotate($stamp, $deg[$i], $white);
@@ -69,23 +74,9 @@ class Image
 	public function drawFigures()
 	{
 		foreach ($this->figures as $figure) {
-			$color = \imagecolorallocate($this->image, $figure->color[0], $figure->color[1], $figure->color[2]);
-			if ($figure->type === 'square') {
-				imagefilledrectangle(
-					$this->image,
-					$figure->x,
-					$figure->y,
-					$figure->x + $figure->width,
-					$figure->y + $figure->height,
-					$color
-				);
-			}
+			$figure->render($this->image);
 			$this->rotate();
 		}
-	}
-
-	public function random() {
-		return \rand(0, 512 - 20);
 	}
 
 	public function rotate()
@@ -114,6 +105,28 @@ class Image
 		}
 	}
 
+	private function getRandomSquare()
+	{
+		$x = $this->getRandomX();
+		$y = $this->getRandomY();
+		$width = rand(20, 50);
+		$filled = rand(0, 1);
+		$figure = new Square($x, $y, $width, '#000', $filled);
+		$this->addToOccupied($x, $y, $width, $width);
+		return $figure;
+	}
+
+	private function getRandomTriangle()
+	{
+		$x = $this->getRandomX();
+		$y = $this->getRandomY();
+		$length = rand(20, 50);
+		$filled = rand(0,1);
+		$figure = new RightTriangle($x, $y, $length, '#000', $filled);
+		$this->addToOccupied($x, $y, $length, $length);
+		return $figure;
+	}
+
 	private function allocateCollor($image, $color)
 	{
 		if (is_string($color)) {
@@ -124,21 +137,12 @@ class Image
 
 	private function addToOccupied($x, $y, $width, $height)
 	{
-		$deltaX = abs($x - $width);
-		$deltaY = abs($y - $height);
-
-		$xs = [];
-		$ys = [];
-
-		for ($i = 0; $i < $deltaX; $i++) {
-			$xs[] = $x + $i;
+		for ($i = 0; $i < $width; $i++) {
+			$this->occupied['x'][] = $x + $i;
 		}
-
-		for ($i = 0; $i < $deltaY; $i++) {
-			$ys[] = $y + $i;
+		for ($i = 0; $i < $height; $i++) {
+			$this->occupied['y'][] = $y + $i;
 		}
-
-		return ['x' => $xs, 'y' => $ys];
 	}
 
 	private function getRandomX($width = 0)

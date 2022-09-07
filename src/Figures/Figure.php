@@ -8,10 +8,11 @@ abstract class Figure
 	public $x;
 	public $y;
 
-	public function __construct($type, $x, $y)
+	public function __construct($x, $y)
 	{
-		$this->type = $type;
-		$this->$x = $x;
+		$this->x = $x;
 		$this->y = $y;
 	}
+
+	public abstract function render($image);
 }
