@@ -20,6 +20,7 @@ class Image
 	protected $filterChance = 100;
 	protected $maxRotation = 2;
 	protected $curRotation = 0;
+	protected $label = '';
 	public $pivot;
 	protected $occupied = ['x' => [], 'y' => []];
 
@@ -34,9 +35,9 @@ class Image
 		$this->hexBackground = $background;
 		
 		imagefill($this->image, 0, 0, $this->background);
-		$this->addPivots();
 		$this->addFigures();
 		$this->drawFigures();
+		$this->addPivots();
 	}
 
 	public function addFigures()
@@ -56,9 +57,9 @@ class Image
 		];
 		$amountOfFigures = 0;
 		if ($this->width === 512) {
-			$amountOfFigures = \mt_rand(30,50);
+			$amountOfFigures = \mt_rand(50,70);
 		} elseif ($this->width === 768) {
-			$amountOfFigures = \mt_rand(40, 70);
+			$amountOfFigures = \mt_rand(60, 100);
 		}
 
 		for ($i = 0; $i < $amountOfFigures; $i++) {
@@ -76,12 +77,13 @@ class Image
 			$sy = imagesy($this->pivot);
 			$x = $this->getRandomX($this->width - $sx);
 			$y = $this->getRandomY($this->width - $sy);
-			$this->addToOccupied($x, $y, $sx, $sy);
 			$tilt = mt_rand(95, 100) / 100;
 			$this->pivot = $this->imageFilter($this->pivot);
 			$this->pivot = $this->perspective($this->pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
 			$stamp = $this->pivot;
 			$stamp = imagerotate($stamp, $deg[$i], $this->background);
+			$label = $this->calculateLabel($x, $y, imagesx($stamp), imagesx($stamp), $i);
+			$this->label .= $label . PHP_EOL;
 			imagecopy(
 				$this->image,
 				$stamp,
@@ -93,6 +95,15 @@ class Image
 				imagesy($stamp)
 			);
 		}
+	}
+
+	public function calculateLabel($x, $y, $width, $height, $classId)
+	{
+		$xMin = $x / $this->width;
+		$yMin = $y / $this->height;
+		$xMax = ($x + $width) / $this->width;
+		$yMax = ($y + $height) / $this->height;
+		return "$classId $xMin $yMin $xMax $yMax";
 	}
 
 
@@ -109,27 +120,9 @@ class Image
 		if ($this->rotateChance > 0 && mt_rand(0, 100) <= $this->rotateChance && $this->curRotation < $this->maxRotation) {
 			$deg = mt_rand(0, 360);
 			$oldImage = $this->image;
-			$oldsx = imagesx($oldImage);
-			$oldsy = imagesy($oldImage);
 			$this->image = imagerotate($this->image, $deg, $this->background);
-			$newsx = imagesx($this->image);
-			$newsy = imagesy($this->image);
-			//var_dump($this->occupied['x'][0], $this->occupied['y'][0]);
-			$this->updateOccupied($newsx - $oldsx, $newsy - $oldsy);
 			imagedestroy($oldImage);
-			//var_dump($this->occupied['x'][0], $this->occupied['y'][0]);
 			$this->curRotation++;
-		}
-	}
-
-
-	protected function updateOccupied($deltaX, $deltaY)
-	{
-		for ($i = 0, $limit = count($this->occupied['x']); $i < $limit; $i++) {
-			$this->occupied['x'][$i] += $deltaX;
-		}
-		for ($i = 0, $limit = count($this->occupied['y']); $i < $limit; $i++) {
-			$this->occupied['y'][$i] += $deltaY;
 		}
 	}
 
@@ -142,9 +135,18 @@ class Image
 			imagepng($this->image, $binaryStream);
 			rewind($binaryStream);
 			$stringData = stream_get_contents($binaryStream);
-			$name = $dir . $this->width . 'x' . $this->height . hash('md5', $stringData) . '.png';
+			$name = $dir . $this->width . 'x' . $this->height . '_' . hash('md5', $stringData);
+			$imageName = $name . '.png';
+			$labelName = $name . '.txt';
 			imagealphablending($this->image, true);
-			imagepng($this->image, $name);
+			imagesavealpha($this->image, true);
+			imagepng($this->image, $imageName);
+			$labelStream = fopen($labelName, 'w+');
+			try {
+				fwrite($labelStream, $this->label);
+			} finally {
+				fclose($labelStream);
+			}
 		} finally {
 			fclose($binaryStream);
 			imagedestroy($this->image);
@@ -210,24 +212,9 @@ class Image
 		if (is_string($color)) {
 			$color = HexToRGB::translate($color);
 		}
-		return \imagecolorallocate($image, $color[0], $color[1], $color[2]);
+		return imagecolorallocate($image, $color[0], $color[1], $color[2]);
 	}
 
-	private function addToOccupied($x, $y, $width, $height)
-	{
-		for ($i = 0; $i < $width; $i++) {
-			$this->occupied['x'][] = $x + $i;
-			if ($i > 0 && $width) {
-				$this->occupied['x'][] = $x - $i;
-			}
-		}
-		for ($i = 0; $i < $height; $i++) {
-			$this->occupied['y'][] = $y + $i;
-			if ($i > 0 && $i < $height) {
-				$this->occupied['y'][] = $y - $i;
-			}
-		}
-	}
 
 	private function getRandomTiltSide()
 	{
@@ -237,11 +224,6 @@ class Image
 	private function getRandomCoordinates() {
 		$x = $this->getRandomX();
 		$y = $this->getRandomY();
-
-		if (in_array($x, $this->occupied['x']) && in_array($y, $this->occupied['y'])) {
-			return $this->getRandomCoordinates();
-		}
-
 		return ['x' => $x,'y' => $y];
 	}
 

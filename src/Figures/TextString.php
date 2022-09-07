@@ -6,7 +6,7 @@ use Volochaev\ImageGeneration\Helpers\HexToRGB;
 
 class TextString extends Figure
 {
-	private $chars = ['а','б','в','г','д','е','ж','з','к', ' '];
+	private $chars = ['a','B','c','H','y','A','T','M',',', ' '];
 	public $font;
 	public $string;
 
@@ -21,7 +21,7 @@ class TextString extends Figure
 	public function render($image)
 	{
 		$color = imagecolorallocate($image, $this->color[0], $this->color[1], $this->color[2]);
-		imagestring($image, 5, $this->x, $this->y, $this->string, $color);
+		imagestring($image, 1, $this->x, $this->y, $this->string, $color);
 	}
 
 	private function generateRandomString()
