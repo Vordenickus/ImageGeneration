@@ -5,9 +5,8 @@ namespace Volochaev\ImageGeneration;
 use Volochaev\ImageGeneration\Figures\Circle;
 use Volochaev\ImageGeneration\Figures\RightTriangle;
 use Volochaev\ImageGeneration\Figures\Square;
-
+use Volochaev\ImageGeneration\Figures\TextString;
 use Volochaev\ImageGeneration\Helpers\HexToRGB;
-use WideImage\WideImage;
 
 class Image
 {
@@ -18,6 +17,7 @@ class Image
 	protected $image;
 	protected $figures = [];
 	protected $rotateChance = 20;
+	protected $filterChance = 100;
 	protected $maxRotation = 2;
 	protected $curRotation = 0;
 	public $pivot;
@@ -44,10 +44,11 @@ class Image
 		$figures = [
 			'circle',
 			'rightTriangle',
-			'square'
+			'square',
+			'string'
 		];
 		$colors = [
-			'#000',
+			'#000000',
 			'#f34044',
 			'#734f34',
 			'#fd3292',
@@ -77,6 +78,7 @@ class Image
 			$y = $this->getRandomY($this->width - $sy);
 			$this->addToOccupied($x, $y, $sx, $sy);
 			$tilt = mt_rand(95, 100) / 100;
+			$this->pivot = $this->imageFilter($this->pivot);
 			$this->pivot = $this->perspective($this->pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
 			$stamp = $this->pivot;
 			$stamp = imagerotate($stamp, $deg[$i], $this->background);
@@ -107,9 +109,27 @@ class Image
 		if ($this->rotateChance > 0 && mt_rand(0, 100) <= $this->rotateChance && $this->curRotation < $this->maxRotation) {
 			$deg = mt_rand(0, 360);
 			$oldImage = $this->image;
+			$oldsx = imagesx($oldImage);
+			$oldsy = imagesy($oldImage);
 			$this->image = imagerotate($this->image, $deg, $this->background);
+			$newsx = imagesx($this->image);
+			$newsy = imagesy($this->image);
+			//var_dump($this->occupied['x'][0], $this->occupied['y'][0]);
+			$this->updateOccupied($newsx - $oldsx, $newsy - $oldsy);
 			imagedestroy($oldImage);
+			//var_dump($this->occupied['x'][0], $this->occupied['y'][0]);
 			$this->curRotation++;
+		}
+	}
+
+
+	protected function updateOccupied($deltaX, $deltaY)
+	{
+		for ($i = 0, $limit = count($this->occupied['x']); $i < $limit; $i++) {
+			$this->occupied['x'][$i] += $deltaX;
+		}
+		for ($i = 0, $limit = count($this->occupied['y']); $i < $limit; $i++) {
+			$this->occupied['y'][$i] += $deltaY;
 		}
 	}
 
@@ -142,6 +162,8 @@ class Image
 				return $this->getRandomCircle($color);
 			case 'rightTriangle':
 				return $this->getRandomTriangle($color);
+			case 'string':
+				return $this->getRandomString($color);
 		}
 	}
 
@@ -175,6 +197,14 @@ class Image
 		return $figure;
 	}
 
+
+	private function getRandomString($color)
+	{
+		$coordinates = $this->getRandomCoordinates();
+		$figure = new TextString($coordinates['x'], $coordinates['y'], $color);
+		return $figure;
+	}
+
 	private function allocateCollor($image, $color)
 	{
 		if (is_string($color)) {
@@ -187,13 +217,13 @@ class Image
 	{
 		for ($i = 0; $i < $width; $i++) {
 			$this->occupied['x'][] = $x + $i;
-			if ($i > 0 && $width / 2) {
+			if ($i > 0 && $width) {
 				$this->occupied['x'][] = $x - $i;
 			}
 		}
 		for ($i = 0; $i < $height; $i++) {
 			$this->occupied['y'][] = $y + $i;
-			if ($i > 0 && $i < $height / 2) {
+			if ($i > 0 && $i < $height) {
 				$this->occupied['y'][] = $y - $i;
 			}
 		}
@@ -223,6 +253,17 @@ class Image
 	private function getRandomY($height = 0)
 	{
 		return $this->getRandomCoordinate($height === 0 ? $this->height : $height, 'y');
+	}
+
+	private function imageFilter($img)
+	{
+		if (mt_rand(0, 100) < $this->filterChance) {
+			imagefilter($img, IMG_FILTER_BRIGHTNESS, mt_rand(-100, 100));
+		}
+		if (mt_rand(0, 100) < $this->filterChance) {
+			imagefilter($img, IMG_FILTER_GAUSSIAN_BLUR);
+		}
+		return $img;
 	}
 
 	private function getRandomCoordinate($limit = 0)

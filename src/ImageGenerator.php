@@ -7,7 +7,7 @@ class ImageGenerator
 {
 
 	protected const COLORS = [
-		'#fff',
+		'#FFFFFF',
 		'#808080',
 		'#a9a9a9',
 		'#838383',
