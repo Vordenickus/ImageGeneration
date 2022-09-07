@@ -14,6 +14,7 @@ class Image
 	public $width;
 	public $height;
 	protected $background;
+	protected $hexBackground;
 	protected $image;
 	protected $figures = [];
 	protected $rotateChance = 20;
@@ -30,6 +31,7 @@ class Image
 		$this->image = imagecreatetruecolor($this->width, $this->height);
 		$this->pivot = imagecreatefrompng(__DIR__ . '/../ideal/scan-mark.png');
 		$this->background = $this->allocateCollor($this->image, $background);
+		$this->hexBackground = $background;
 		
 		imagefill($this->image, 0, 0, $this->background);
 		$this->addPivots();
@@ -51,7 +53,12 @@ class Image
 			'#fd3292',
 			'#f09746'
 		];
-		$amountOfFigures = mt_rand(20, 40);
+		$amountOfFigures = 0;
+		if ($this->width === 512) {
+			$amountOfFigures = \mt_rand(30,50);
+		} elseif ($this->width === 768) {
+			$amountOfFigures = \mt_rand(40, 70);
+		}
 
 		for ($i = 0; $i < $amountOfFigures; $i++) {
 			$figure = mt_rand(0, count($figures) -1);
@@ -70,7 +77,7 @@ class Image
 			$y = $this->getRandomY($this->width - $sy);
 			$this->addToOccupied($x, $y, $sx, $sy);
 			$tilt = mt_rand(95, 100) / 100;
-			$this->pivot = $this->perspective($this->pivot, $tilt);
+			$this->pivot = $this->perspective($this->pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
 			$stamp = $this->pivot;
 			$stamp = imagerotate($stamp, $deg[$i], $this->background);
 			imagecopy(
@@ -81,7 +88,8 @@ class Image
 				0,
 				0,
 				imagesx($stamp),
-				imagesy($stamp));
+				imagesy($stamp)
+			);
 		}
 	}
 
@@ -120,6 +128,7 @@ class Image
 		} finally {
 			fclose($binaryStream);
 			imagedestroy($this->image);
+			imagedestroy($this->pivot);
 		}
 	}
 
@@ -190,6 +199,11 @@ class Image
 		}
 	}
 
+	private function getRandomTiltSide()
+	{
+		return mt_rand(0,3);
+	}
+
 	private function getRandomCoordinates() {
 		$x = $this->getRandomX();
 		$y = $this->getRandomY();
@@ -217,7 +231,7 @@ class Image
 		return $coord;
 	}
 
-	function perspective($i,$gradient=0.85,$rightdown=TOP,$background=0xFFFFFF, $alpha=0) {
+	function perspective($i,$gradient=0.85,$rightdown=0,$background=0xFFFFFF, $alpha=0) {
 		$w=imagesx($i);
 		$h=imagesy($i);
 		$col=imagecolorallocatealpha($i,($background>>16)&0xFF,($background>>8)&0xFF,$background&0xFF,$alpha);
