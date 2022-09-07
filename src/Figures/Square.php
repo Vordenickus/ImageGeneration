@@ -7,6 +7,7 @@ class Square extends Figure
 	public $x2;
 	public $y2;
 	public $type = 'square';
+	
 	public $width;
 	public $height;
 	public $color;

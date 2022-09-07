@@ -2,13 +2,21 @@
 
 namespace Volochaev\ImageGeneration;
 
+use Volochaev\ImageGeneration\Helpers\HexToRGB;
+use Volochaev\ImageGeneration\Image;
 class ImageGenerator 
 {
+
+	protected $white = '#fff';
+	protected $black = '#000';
+	protected $gray = '';
+
+
 	public function __construct()
 	{
-		$image = new \Volochaev\ImageGeneration\Image(512,512, [255,255,255]);
-
-		$image->generateAndSave();
-
+		for ($i = 0; $i < 1; $i++) {
+			$image = new Image(512, 512, $this->white);
+			$image->generateAndSave();
+		}
 	}
 }
