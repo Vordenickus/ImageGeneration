@@ -35,9 +35,6 @@ class Image
 		$this->hexBackground = $background;
 		
 		imagefill($this->image, 0, 0, $this->background);
-		$this->addFigures();
-		$this->drawFigures();
-		$this->addPivots();
 	}
 
 	public function addFigures()
@@ -60,6 +57,8 @@ class Image
 			$amountOfFigures = \mt_rand(50,70);
 		} elseif ($this->width === 768) {
 			$amountOfFigures = \mt_rand(60, 100);
+		} elseif ($this->width === 1024) {
+			$amountOfFigures = \mt_rand(80, 120);
 		}
 
 		for ($i = 0; $i < $amountOfFigures; $i++) {
@@ -75,8 +74,9 @@ class Image
 		for($i = 0; $i < 4; $i++) {
 			$sx = imagesx($this->pivot);
 			$sy = imagesy($this->pivot);
-			$x = $this->getRandomX($this->width - $sx);
-			$y = $this->getRandomY($this->width - $sy);
+			$coord = $this->getRandomCoordinates(true);
+			$x = $coord['x'];
+			$y = $coord['y'];
 			$tilt = mt_rand(95, 100) / 100;
 			$this->pivot = $this->imageFilter($this->pivot);
 			$this->pivot = $this->perspective($this->pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
@@ -84,6 +84,7 @@ class Image
 			$stamp = imagerotate($stamp, $deg[$i], $this->background);
 			$label = $this->calculateLabel($x, $y, imagesx($stamp), imagesx($stamp), $i);
 			$this->label .= $label . PHP_EOL;
+			$this->addToOccupied($x, $y, $sx, $sy);
 			imagecopy(
 				$this->image,
 				$stamp,
@@ -223,9 +224,12 @@ class Image
 		return mt_rand(0,3);
 	}
 
-	private function getRandomCoordinates() {
+	private function getRandomCoordinates($unique = false) {
 		$x = $this->getRandomX();
 		$y = $this->getRandomY();
+		if ($unique && in_array($x, $this->occupied['x']) && \in_array($y, $this->occupied['y'])) {
+			return $this->getRandomCoordinates($unique);
+		}
 		return ['x' => $x,'y' => $y];
 	}
 
@@ -254,6 +258,27 @@ class Image
 	{
 		$coord = mt_rand(0, $limit);
 		return $coord;
+	}
+
+	protected function addToOccupied($x, $y, $width, $height)
+	{
+		for ($i = 0; $i < $width; $i++) {
+			$deltaPlus = $x + $i;
+			$deltaMinus = $x - $i;
+			$this->occupied['x'][] = $deltaPlus;
+			if ($deltaMinus !== $deltaPlus) {
+				$this->occupied['x'][] = $deltaMinus;
+			}
+		}
+
+		for ($i = 0; $i < $height; $i++) {
+			$deltaPlus = $y + $i;
+			$deltaMinus = $y - $i;
+			$this->occupied['x'][0] = $deltaPlus;
+			if ($deltaMinus !== $deltaPlus) {
+				$this->occupied['x'][] = $deltaMinus;
+			}
+		}
 	}
 
 	function perspective($i,$gradient=0.85,$rightdown=0,$background=0xFFFFFF, $alpha=0) {
