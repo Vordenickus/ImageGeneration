@@ -4,6 +4,8 @@ use Volochaev\ImageGeneration\ImageGenerator;
 
 include('./vendor/autoload.php');
 
+ini_set('memory_limit', '1024M');
+
 define("TOP",0);
 define("BOTTOM",1);
 define("LEFT",2);

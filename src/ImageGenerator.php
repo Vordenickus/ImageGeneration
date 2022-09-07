@@ -14,9 +14,11 @@ class ImageGenerator
 
 	public function __construct()
 	{
-		for ($i = 0; $i < 1; $i++) {
+		$now = microtime(true);
+		for ($i = 0; $i < 10; $i++) {
 			$image = new Image(512, 512, $this->white);
 			$image->generateAndSave();
 		}
+		var_dump(microtime(true) - $now);
 	}
 }

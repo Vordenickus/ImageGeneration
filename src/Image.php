@@ -2,6 +2,7 @@
 
 namespace Volochaev\ImageGeneration;
 
+use Volochaev\ImageGeneration\Figures\Circle;
 use Volochaev\ImageGeneration\Figures\RightTriangle;
 use Volochaev\ImageGeneration\Figures\Square;
 
@@ -35,12 +36,22 @@ class Image
 
 	public function addFigure($figure)
 	{
-		for ($i = 0; $i < 6; $i++) {
-			$this->figures[] = $this->getRandomTriangle();
-		}
+		$figures = [
+			'circle',
+			'rightTriangle',
+			'square'
+		];
+		$colors = [
+			'#000',
+			'#f34044',
+			'#734f34'
+		];
+		$amountOfFigures = mt_rand(20, 40);
 
-		for ($i = 0; $i < 6; $i++) {
-			$this->figures[] = $this->getRandomSquare();
+		for ($i = 0; $i < $amountOfFigures; $i++) {
+			$figure = mt_rand(0, count($figures) -1);
+			$color = mt_rand(0, count($colors) - 1);
+			$this->figures[] = $this->getRandomFigure($figures[$figure], $colors[$color]);
 		}
 	}
 
@@ -54,7 +65,7 @@ class Image
 			$x = $this->getRandomX($this->width - $sx);
 			$y = $this->getRandomY($this->width - $sy);
 			$this->addToOccupied($x, $y, $sx, $sy);
-			$tilt = rand(95, 100) / 100;
+			$tilt = mt_rand(95, 100) / 100;
 			$this->pivot = $this->perspective($this->pivot, $tilt);
 			$stamp = $this->pivot;
 			$stamp = imagerotate($stamp, $deg[$i], $white);
@@ -81,10 +92,10 @@ class Image
 
 	public function rotate()
 	{
-		if ($this->rotateChance > 0 && rand(0, 100) <= $this->rotateChance) {
-			$deg = rand(0, 360);
-			$white = \imagecolorallocate($this->image, 255, 255, 255);
-			$this->image = \imagerotate($this->image, $deg, $white);
+		if ($this->rotateChance > 0 && mt_rand(0, 100) <= $this->rotateChance) {
+			$deg = mt_rand(0, 360);
+			$white = imagecolorallocate($this->image, 255, 255, 255);
+			$this->image = imagerotate($this->image, $deg, $white);
 		}
 	}
 
@@ -105,25 +116,49 @@ class Image
 		}
 	}
 
-	private function getRandomSquare()
+
+	private function getRandomFigure($figure, $color)
+	{
+		switch ($figure) {
+			case 'square':
+				return $this->getRandomSquare($color);
+			case 'circle':
+				return $this->getRandomCircle($color);
+			case 'rightTriangle':
+				return $this->getRandomTriangle($color);
+		}
+	}
+
+
+	private function getRandomSquare($color)
 	{
 		$x = $this->getRandomX();
 		$y = $this->getRandomY();
-		$width = rand(20, 50);
-		$filled = rand(0, 1);
-		$figure = new Square($x, $y, $width, '#000', $filled);
-		$this->addToOccupied($x, $y, $width, $width);
+		$width = mt_rand(20, 50);
+		$filled = mt_rand(0, 1);
+		$figure = new Square($x, $y, $width, $color, $filled);
 		return $figure;
 	}
 
-	private function getRandomTriangle()
+
+	private function getRandomTriangle($color)
 	{
 		$x = $this->getRandomX();
 		$y = $this->getRandomY();
-		$length = rand(20, 50);
-		$filled = rand(0,1);
-		$figure = new RightTriangle($x, $y, $length, '#000', $filled);
-		$this->addToOccupied($x, $y, $length, $length);
+		$length = mt_rand(20, 50);
+		$filled = mt_rand(0,1);
+		$figure = new RightTriangle($x, $y, $length, $color, $filled);
+		return $figure;
+	}
+
+
+	private function getRandomCircle($color)
+	{
+		$x = $this->getRandomX();
+		$y = $this->getRandomY();
+		$length = mt_rand(20, 50);
+		$filled = mt_rand(0,1);
+		$figure = new Circle($x, $y, $length, $color);
 		return $figure;
 	}
 
@@ -139,9 +174,15 @@ class Image
 	{
 		for ($i = 0; $i < $width; $i++) {
 			$this->occupied['x'][] = $x + $i;
+			if ($i > 0) {
+				$this->occupied['x'][] = $x - $i;
+			}
 		}
 		for ($i = 0; $i < $height; $i++) {
 			$this->occupied['y'][] = $y + $i;
+			if ($i > 0) {
+				$this->occupied['y'][] = $y - $i;
+			}
 		}
 	}
 
@@ -157,8 +198,10 @@ class Image
 
 	private function getRandomCoordinate($limit = 0, $coordinateType)
 	{
-		$coord = rand(0, $limit);
-		if (in_array($coord, $this->occupied[$coordinateType]) || in_array($coord + $limit, $this->occupied[$coordinateType])) {
+		$coord = mt_rand(0, $limit);
+		if (
+			(in_array($coord, $this->occupied[$coordinateType])) || 
+			(in_array($coord + $limit, $this->occupied[$coordinateType]))) {
 			return $this->getRandomCoordinate($limit, $coordinateType);
 		}
 		return $coord;
