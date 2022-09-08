@@ -2,6 +2,7 @@
 
 namespace Volochaev\ImageGeneration\Figures;
 
+use InvalidArgumentException;
 use Volochaev\ImageGeneration\Figures\Figure;
 use Volochaev\ImageGeneration\Helpers\HexToRGB;
 
@@ -12,6 +13,9 @@ class Triangle extends Figure
 
 	public function __construct($verticies, $filled, $color)
 	{
+		if (count($verticies) > 6) {
+			throw new InvalidArgumentException('Максимум 3 вершины у треугольника');
+		}
 		$this->x = $verticies[0];
 		$this->y = $verticies[1];
 		$this->vertices = $verticies;
