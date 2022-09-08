@@ -54,7 +54,7 @@ class Square extends Figure
 		$sin = sin(deg2rad($deg));
 		$cos = cos(deg2rad($deg));
 
-		
+
 		foreach ($vertices as $vertex) {
 			$x = $vertex[0];
 			$y = $vertex[1];

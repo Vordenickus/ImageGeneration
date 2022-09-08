@@ -60,7 +60,7 @@ class RightTriangle extends Figure
 			$x = $vertex[0];
 			$y = $vertex[1];
 			$newVertices[] = ($x * $cos - $y * $sin) + $factor * 6;
-			$newVertices[] = ($x * $sin + $y * $cos) - $factor * 6; 
+			$newVertices[] = ($x * $sin + $y * $cos) - $factor * 6;
 		}
 
 		$this->vertices = $newVertices;

@@ -3,7 +3,7 @@
 namespace Volochaev\ImageGeneration;
 
 use Volochaev\ImageGeneration\Image;
-class ImageGenerator 
+class ImageGenerator
 {
 	protected const COLORS = [
 		'#FFFFFF',
@@ -32,7 +32,7 @@ class ImageGenerator
 	}
 
 
-	public function generateDataset($amount, $cleadDir = true) 
+	public function generateDataset($amount, $cleadDir = true)
 	{
 		$this->createDir();
 		if ($cleadDir) {

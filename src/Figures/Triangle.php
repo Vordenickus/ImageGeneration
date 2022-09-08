@@ -56,6 +56,8 @@ class Triangle extends Figure
 			$newVerticies[] = ($x * $sin + $y * $cos) - $factor;
 		}
 
+
+
 		$this->vertices = $newVerticies;
 	}
 
@@ -65,11 +67,11 @@ class Triangle extends Figure
 		$vertexA = $verticies[0];
 		$vertexB = $verticies[1];
 		$vertexC = $verticies[2];
-		return 
+		return
 		((($vertexA[0] * ($vertexB[1] - $vertexC[1])) +
 		 ($vertexB[0] * ($vertexC[1] - $vertexA[1])) +
 		 ( $vertexC[0] * ($vertexA[1] - $vertexB[1]))
-		) / 2); 
+		) / 2);
 	}
 
 	public static function constructInArea($x, $y, $width, $height, $filled, $color)

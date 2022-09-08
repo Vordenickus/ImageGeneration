@@ -7,4 +7,4 @@ include('./vendor/autoload.php');
 error_reporting(E_ALL ^ E_DEPRECATED ^ E_WARNING);
 
 $image = new ImageGenerator();
-$image->generateDataset(300);
+$image->generateDataset(30);

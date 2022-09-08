@@ -49,7 +49,7 @@ class Image
 		$this->pivot = imagecreatefrompng(__DIR__ . '/../ideal/scan-mark.png');
 		$this->background = $this->allocateCollor($this->image, $background);
 		$this->hexBackground = $background;
-		
+
 		imagefill($this->image, 0, 0, $this->background);
 	}
 
