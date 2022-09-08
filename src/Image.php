@@ -263,7 +263,12 @@ class Image
 	protected function getRandomCoordinates($unique = true, $width = 0) {
 		$x = $this->getRandomX($width);
 		$y = $this->getRandomY($width);
-		if ($unique && ((in_array($x, $this->occupied['x'])) && (in_array($y, $this->occupied['y'])))) {
+		if (
+			$unique &&
+			(
+				(in_array($x, $this->occupied['x'])) &&
+				(in_array($y, $this->occupied['y']))
+			)) {
 			return $this->getRandomCoordinates($unique);
 		}
 		return ['x' => $x,'y' => $y];

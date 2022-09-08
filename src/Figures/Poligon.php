@@ -2,6 +2,7 @@
 
 namespace Volochaev\ImageGeneration\Figures;
 
+use Volochaev\ImageGeneration\Helpers\HexToRGB;
 
 class Poligon extends Figure
 {
@@ -86,5 +87,24 @@ class Poligon extends Figure
 			$vertices[] = $vertex;
 		}
 		return $vertex;
+	}
+
+
+	public static function createRandomPoligon($image, $x, $y, $width, $height, $amountOfVertites, $color)
+	{
+		$xMax = $x + $width;
+		$yMax = $y + $height;
+
+		$verticies = [];
+		for ($i = 0; $i < $amountOfVertites; $i++) {
+			$verticies[] = rand($x, $xMax);
+			$verticies[] = rand($y, $yMax);
+		}
+
+		$filled = rand(0, 1);
+		$color = is_string($color) ? HexToRGB::translate($color) : $color;
+		$color = imagecolorallocate($image, $color[0], $color[1], $color[2]);
+
+		return new Poligon($verticies, $filled, $color);
 	}
 }
