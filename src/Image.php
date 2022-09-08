@@ -318,6 +318,7 @@ class Image
 
 	/**
 	 * Сколлективизиравано
+	 * добавляет наклон изображению
 	 */
 	protected function perspective($i,$gradient=0.85,$rightdown=0,$background=0xFFFFFF, $alpha=0) {
 		$w=imagesx($i);
