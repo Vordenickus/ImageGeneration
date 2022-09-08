@@ -2,12 +2,11 @@
 
 namespace Volochaev\ImageGeneration;
 
-use Triangle;
 use Volochaev\ImageGeneration\Figures\Circle;
 use Volochaev\ImageGeneration\Figures\RightTriangle;
 use Volochaev\ImageGeneration\Figures\Square;
 use Volochaev\ImageGeneration\Figures\TextString;
-use Volochaev\ImageGeneration\Figures\Triangle as FiguresTriangle;
+use Volochaev\ImageGeneration\Figures\Triangle;
 use Volochaev\ImageGeneration\Helpers\HexToRGB;
 use Volochaev\ImageGeneration\Helpers\LoadImage;
 
@@ -223,7 +222,7 @@ class Image
 		$width = rand(20,50);
 		$coordinates = $this->getRandomCoordinates();
 		$filled = rand(0,1);
-		$figure = FiguresTriangle::constructInArea($coordinates['x'], $coordinates['y'], $width, $width, $filled, $color);
+		$figure = Triangle::constructInArea($coordinates['x'], $coordinates['y'], $width, $width, $filled, $color);
 		return $figure;
 	}
 
