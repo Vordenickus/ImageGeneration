@@ -58,7 +58,7 @@ class Image
 		} elseif ($this->width === 768) {
 			$amountOfFigures = \mt_rand(60, 100);
 		} elseif ($this->width === 1024) {
-			$amountOfFigures = \mt_rand(80, 120);
+			$amountOfFigures = \mt_rand(100, 120);
 		}
 
 		for ($i = 0; $i < $amountOfFigures; $i++) {
