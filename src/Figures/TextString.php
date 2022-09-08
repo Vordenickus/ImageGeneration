@@ -29,10 +29,10 @@ class TextString extends Figure
 
 	private function generateRandomString()
 	{
-		$length = mt_rand(5, 20);
+		$length = rand(5, 20);
 		$string = '';
 		for ($i = 0; $i < $length; $i++) {
-			$charIndex = mt_rand(0, count($this->chars));
+			$charIndex = rand(0, count($this->chars));
 			$string .= $this->chars[$charIndex];
 		}
 		return $string;

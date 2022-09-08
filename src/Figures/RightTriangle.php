@@ -30,7 +30,7 @@ class RightTriangle extends Figure
 
 	public function render($image)
 	{
-		$color = \imagecolorallocate($image, $this->color[0], $this->color[1], $this->color[2]);
+		$color = imagecolorallocate($image, $this->color[0], $this->color[1], $this->color[2]);
 
 		if ($this->filled) {
 			imagefilledpolygon($image, $this->vertices, 3 ,$color);
