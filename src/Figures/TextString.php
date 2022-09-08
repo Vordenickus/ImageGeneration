@@ -10,6 +10,7 @@ class TextString extends Figure
 	public $font;
 	public $string;
 
+
 	public function __construct($x, $y, $color)
 	{
 		$this->x = $x;
@@ -18,11 +19,13 @@ class TextString extends Figure
 		$this->color = is_string($color) ? HexToRGB::translate($color) : $color;
 	}
 
+
 	public function render($image)
 	{
 		$color = imagecolorallocate($image, $this->color[0], $this->color[1], $this->color[2]);
 		imagestring($image, 1, $this->x, $this->y, $this->string, $color);
 	}
+
 
 	private function generateRandomString()
 	{
@@ -33,5 +36,10 @@ class TextString extends Figure
 			$string .= $this->chars[$charIndex];
 		}
 		return $string;
+	}
+
+
+	public function rotate($deg) {
+		return;
 	}
 }

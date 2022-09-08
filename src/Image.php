@@ -16,13 +16,12 @@ class Image
 	protected $hexBackground;
 	protected $image;
 	protected $figures = [];
-	protected $rotateChance = 20;
-	protected $filterChance = 100;
-	protected $maxRotation = 2;
-	protected $curRotation = 0;
+	protected $rotateChance = 40;
+	protected $filterChance = 40;
 	protected $label = '';
-	public $pivot;
+	protected $pivot;
 	protected $occupied = ['x' => [], 'y' => []];
+
 
 	public function __construct($width, $height, $background)
 	{
@@ -36,6 +35,7 @@ class Image
 		
 		imagefill($this->image, 0, 0, $this->background);
 	}
+
 
 	public function addFigures()
 	{
@@ -68,6 +68,7 @@ class Image
 		}
 	}
 
+
 	public function addPivots()
 	{
 		$deg = [0, 90, 180, 270];
@@ -98,7 +99,8 @@ class Image
 		}
 	}
 
-	public function calculateLabel($x, $y, $width, $height, $classId)
+
+	protected function calculateLabel($x, $y, $width, $height, $classId)
 	{
 		$imageWidth = imagesx($this->image);
 		$imageHeigth = imagesy($this->image);
@@ -114,18 +116,6 @@ class Image
 	{
 		foreach ($this->figures as $figure) {
 			$figure->render($this->image);
-			$this->rotate();
-		}
-	}
-
-	public function rotate()
-	{
-		if ($this->rotateChance > 0 && mt_rand(0, 100) <= $this->rotateChance && $this->curRotation < $this->maxRotation) {
-			$deg = mt_rand(0, 360);
-			$oldImage = $this->image;
-			$this->image = imagerotate($this->image, $deg, $this->background);
-			imagedestroy($oldImage);
-			$this->curRotation++;
 		}
 	}
 
@@ -158,32 +148,49 @@ class Image
 	}
 
 
-	private function getRandomFigure($figure, $color)
+	protected function getRandomFigure($figure, $color)
 	{
+		$randomFigure = null;
 		switch ($figure) {
 			case 'square':
-				return $this->getRandomSquare($color);
+				$randomFigure = $this->getRandomSquare($color);
+				break;
 			case 'circle':
-				return $this->getRandomCircle($color);
+				$randomFigure = $this->getRandomCircle($color);
+				break;
 			case 'rightTriangle':
-				return $this->getRandomTriangle($color);
+				$randomFigure = $this->getRandomTriangle($color);
+				break;
 			case 'string':
-				return $this->getRandomString($color);
+				$randomFigure = $this->getRandomString($color);
+				break;
 		}
+		if (mt_rand(0, 100) < $this->rotateChance) {
+			$deg = mt_rand(30, 80);
+			$randomFigure->rotate($deg);
+		}
+
+		return $randomFigure;
 	}
 
 
-	private function getRandomSquare($color)
+	protected function getRandomSquare($color)
 	{
 		$width = mt_rand(20, 50);
 		$coordinates = $this->getRandomCoordinates();
 		$filled = mt_rand(0, 1);
-		$figure = new Square($coordinates['x'], $coordinates['y'], $width, $color, $filled);
+		$figure = new Square(
+			$coordinates['x'],
+			$coordinates['y'],
+			$width,
+			$color,
+			$filled
+		);
 		return $figure;
 	}
 
 
-	private function getRandomTriangle($color)
+	protected function getRandomTriangle($color)
 	{
 		$length = mt_rand(20, 50);
 		$coordinates = $this->getRandomCoordinates();
@@ -193,7 +200,7 @@ class Image
 	}
 
 
-	private function getRandomCircle($color)
+	protected function getRandomCircle($color)
 	{
 		$length = mt_rand(20, 50);
 		$coordinates = $this->getRandomCoordinates();
@@ -203,14 +210,15 @@ class Image
 	}
 
 
-	private function getRandomString($color)
+	protected function getRandomString($color)
 	{
 		$coordinates = $this->getRandomCoordinates();
 		$figure = new TextString($coordinates['x'], $coordinates['y'], $color);
 		return $figure;
 	}
 
-	private function allocateCollor($image, $color)
+
+	protected function allocateCollor($image, $color)
 	{
 		if (is_string($color)) {
 			$color = HexToRGB::translate($color);
@@ -219,12 +227,13 @@ class Image
 	}
 
 
-	private function getRandomTiltSide()
+	protected function getRandomTiltSide()
 	{
 		return mt_rand(0,3);
 	}
 
-	private function getRandomCoordinates($unique = false) {
+
+	protected function getRandomCoordinates($unique = false) {
 		$x = $this->getRandomX();
 		$y = $this->getRandomY();
 		if ($unique && in_array($x, $this->occupied['x']) && \in_array($y, $this->occupied['y'])) {
@@ -233,17 +242,20 @@ class Image
 		return ['x' => $x,'y' => $y];
 	}
 
-	private function getRandomX($width = 0)
+
+	protected function getRandomX($width = 0)
 	{
 		return $this->getRandomCoordinate($width === 0 ? $this->width : $width, 'x');
 	}
 
-	private function getRandomY($height = 0)
+
+	protected function getRandomY($height = 0)
 	{
 		return $this->getRandomCoordinate($height === 0 ? $this->height : $height, 'y');
 	}
 
-	private function imageFilter($img)
+
+	protected function imageFilter($img)
 	{
 		if (mt_rand(0, 100) < $this->filterChance) {
 			imagefilter($img, IMG_FILTER_BRIGHTNESS, mt_rand(-100, 100));
@@ -254,11 +266,13 @@ class Image
 		return $img;
 	}
 
-	private function getRandomCoordinate($limit = 0)
+
+	protected function getRandomCoordinate($limit = 0)
 	{
 		$coord = mt_rand(0, $limit);
 		return $coord;
 	}
+
 
 	protected function addToOccupied($x, $y, $width, $height)
 	{
@@ -281,7 +295,11 @@ class Image
 		}
 	}
 
-	function perspective($i,$gradient=0.85,$rightdown=0,$background=0xFFFFFF, $alpha=0) {
+
+	/**
+	 * Сколлективизиравано
+	 */
+	protected function perspective($i,$gradient=0.85,$rightdown=0,$background=0xFFFFFF, $alpha=0) {
 		$w=imagesx($i);
 		$h=imagesy($i);
 		$col=imagecolorallocatealpha($i,($background>>16)&0xFF,($background>>8)&0xFF,$background&0xFF,$alpha);

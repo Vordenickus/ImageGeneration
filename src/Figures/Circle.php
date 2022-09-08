@@ -41,4 +41,9 @@ class Circle extends Figure
 			$color
 		);
 	}
+
+	public function rotate($deg) {
+		// Круг покрутился
+		return;
+	}
 }

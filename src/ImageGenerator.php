@@ -19,9 +19,11 @@ class ImageGenerator
 		'#8b0000',
 	];
 
+
 	public function __construct()
 	{
 	}
+
 
 	public function generateDataset($amount, $cleadDir = true) 
 	{
@@ -53,12 +55,14 @@ class ImageGenerator
 		}
 	}
 
+
 	private function getRandomColor()
 	{
 		$colors = static::COLORS;
 		$colorIndex = mt_rand(0,count($colors) - 1);
 		return $colors[$colorIndex];
 	}
+
 
 	private function clear() {
 		$dir = __DIR__ . "/../dataset/";
@@ -69,6 +73,7 @@ class ImageGenerator
 			}
 		}
 	}
+
 
 	private function createDir() {
 		if (is_dir(__DIR__ . "/../dataset")) {

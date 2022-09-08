@@ -15,4 +15,6 @@ abstract class Figure
 	}
 
 	public abstract function render($image);
+
+	public abstract function rotate($deg);
 }
