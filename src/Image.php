@@ -3,6 +3,7 @@
 namespace Volochaev\ImageGeneration;
 
 use Volochaev\ImageGeneration\Figures\Circle;
+use Volochaev\ImageGeneration\Figures\Poligon;
 use Volochaev\ImageGeneration\Figures\RightTriangle;
 use Volochaev\ImageGeneration\Figures\Square;
 use Volochaev\ImageGeneration\Figures\TextString;
@@ -30,7 +31,8 @@ class Image
 		'rightTriangle',
 		'square',
 		'string',
-		'triangle'
+		'triangle',
+		'poligon'
 	];
 	protected const FIGURES_COLORS = [
 		'#000000',
@@ -182,6 +184,9 @@ class Image
 			case 'triangle':
 				$randomFigure = $this->getRandomTriangle($color);
 				break;
+			case 'poligon':
+				$randomFigure = $this->getRandomPoligon($color);
+				break;
 		}
 		if (rand(0, 100) < $this->rotateChance) {
 			$deg = rand(30, 80);
@@ -223,6 +228,26 @@ class Image
 		$coordinates = $this->getRandomCoordinates();
 		$filled = rand(0,1);
 		$figure = Triangle::constructInArea($coordinates['x'], $coordinates['y'], $width, $width, $filled, $color);
+		return $figure;
+	}
+
+
+	protected function getRandomPoligon($color)
+	{
+		$width = rand(20,50);
+		$coordinates = $this->getRandomCoordinates();
+		$filled = rand(0,1);
+		$amountOfVertices = rand(3,8);
+		$figure = Poligon::createRandomPoligon(
+			$this->image,
+			$coordinates['x'],
+			$coordinates['y'],
+			$width,
+			$width,
+			$amountOfVertices,
+			$filled,
+			$color
+		);
 		return $figure;
 	}
 

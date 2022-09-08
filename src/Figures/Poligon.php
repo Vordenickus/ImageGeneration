@@ -22,7 +22,7 @@ class Poligon extends Figure
 	public function render($image)
 	{
 		if ($this->filled) {
-			imagefilledpolygon($image, $this->vertices, count($this->vertices), $this->color);
+			imagefilledpolygon($image, $this->vertices, count($this->vertices) / 2, $this->color);
 			return;
 		}
 		imagepolygon($image, $this->vertices, count($this->vertices) / 2, $this->color);
@@ -90,7 +90,7 @@ class Poligon extends Figure
 	}
 
 
-	public static function createRandomPoligon($image, $x, $y, $width, $height, $amountOfVertites, $color)
+	public static function createRandomPoligon($image, $x, $y, $width, $height, $amountOfVertites, $filled, $color)
 	{
 		$xMax = $x + $width;
 		$yMax = $y + $height;
@@ -101,7 +101,6 @@ class Poligon extends Figure
 			$verticies[] = rand($y, $yMax);
 		}
 
-		$filled = rand(0, 1);
 		$color = is_string($color) ? HexToRGB::translate($color) : $color;
 		$color = imagecolorallocate($image, $color[0], $color[1], $color[2]);
 
