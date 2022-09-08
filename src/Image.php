@@ -35,9 +35,6 @@ class Image
 		$this->hexBackground = $background;
 		
 		imagefill($this->image, 0, 0, $this->background);
-		$this->addFigures();
-		$this->drawFigures();
-		$this->addPivots();
 	}
 
 	public function addFigures()
@@ -60,6 +57,8 @@ class Image
 			$amountOfFigures = \mt_rand(50,70);
 		} elseif ($this->width === 768) {
 			$amountOfFigures = \mt_rand(60, 100);
+		} elseif ($this->width === 1024) {
+			$amountOfFigures = \mt_rand(100, 120);
 		}
 
 		for ($i = 0; $i < $amountOfFigures; $i++) {

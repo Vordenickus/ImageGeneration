@@ -19,28 +19,32 @@ class ImageGenerator
 		'#8b0000',
 	];
 
-	protected $amount = 30;
-	protected $test;
-
 	public function __construct()
 	{
+	}
+
+	public function generateDataset($amount, $cleadDir = true) 
+	{
 		$this->createDir();
-		$this->clear();
-		for ($i = 0; $i < $this->amount / 3; $i++) {
+		if ($cleadDir) {
+			$this->clear();
+		}
+		$image = null;
+		for ($i = 0; $i < $amount / 3; $i++) {
 			$image = new Image(512, 512, $this->getRandomColor());
 			$image->addFigures();
 			$image->drawFigures();
 			$image->addPivots();
 			$image->generateAndSave();
 		}
-		for ($i = 0; $i < $this->amount / 3; $i++) {
+		for ($i = 0; $i < $amount / 3; $i++) {
 			$image = new Image(768, 768, $this->getRandomColor());
 			$image->addFigures();
 			$image->drawFigures();
 			$image->addPivots();
 			$image->generateAndSave();
 		}
-		for ($i = 0; $i < $this->amount / 3; $i++) {
+		for ($i = 0; $i < $amount / 3; $i++) {
 			$image = new Image(1024, 1024, $this->getRandomColor());
 			$image->addFigures();
 			$image->drawFigures();
