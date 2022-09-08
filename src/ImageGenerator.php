@@ -19,6 +19,13 @@ class ImageGenerator
 		'#8b0000',
 	];
 
+	protected const LABELS = [
+		'upper_left',
+		'upper_right',
+		'bottom_left',
+		'bottom_right',
+	];
+
 
 	public function __construct()
 	{
@@ -31,23 +38,17 @@ class ImageGenerator
 		if ($cleadDir) {
 			$this->clear();
 		}
+		$this->generateLabelMap();
 		$image = null;
-		for ($i = 0; $i < $amount / 3; $i++) {
-			$image = new Image(512, 512, $this->getRandomColor());
-			$image->addFigures();
-			$image->drawFigures();
-			$image->addPivots();
-			$image->generateAndSave();
-		}
-		for ($i = 0; $i < $amount / 3; $i++) {
-			$image = new Image(768, 768, $this->getRandomColor());
-			$image->addFigures();
-			$image->drawFigures();
-			$image->addPivots();
-			$image->generateAndSave();
-		}
-		for ($i = 0; $i < $amount / 3; $i++) {
-			$image = new Image(1024, 1024, $this->getRandomColor());
+		for ($i = 0; $i < $amount; $i++) {
+			$image = null;
+			if ($i < $amount / 3) {
+				$image = new Image(512, 512, $this->getRandomColor());
+			} elseif ($i < $amount / 3 * 2) {
+				$image = new Image(768, 768, $this->getRandomColor());
+			} else {
+				$image = new Image(1024, 1024, $this->getRandomColor());
+			}
 			$image->addFigures();
 			$image->drawFigures();
 			$image->addPivots();
@@ -59,12 +60,27 @@ class ImageGenerator
 	private function getRandomColor()
 	{
 		$colors = static::COLORS;
-		$colorIndex = mt_rand(0,count($colors) - 1);
+		$colorIndex = rand(0, count($colors) - 1);
 		return $colors[$colorIndex];
 	}
 
 
-	private function clear() {
+	private function generateLabelMap()
+	{
+		$path = __DIR__ . '/../dataset/_darknet.labels';
+		$stream = fopen($path, 'w+');
+		try {
+			foreach (static::LABELS as $label) {
+				fwrite($stream, $label . PHP_EOL);
+			}
+		} finally {
+			fclose($stream);
+		}
+	}
+
+
+	private function clear()
+	{
 		$dir = __DIR__ . "/../dataset/";
 		$objects = scandir(__DIR__ . "/../dataset/");
 		foreach($objects as $object) {
@@ -75,7 +91,8 @@ class ImageGenerator
 	}
 
 
-	private function createDir() {
+	private function createDir()
+	{
 		if (is_dir(__DIR__ . "/../dataset")) {
 			return true;
 		}

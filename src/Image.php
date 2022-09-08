@@ -54,16 +54,16 @@ class Image
 		];
 		$amountOfFigures = 0;
 		if ($this->width === 512) {
-			$amountOfFigures = \mt_rand(50,70);
+			$amountOfFigures = rand(50,70);
 		} elseif ($this->width === 768) {
-			$amountOfFigures = \mt_rand(60, 100);
+			$amountOfFigures = rand(60, 100);
 		} elseif ($this->width === 1024) {
-			$amountOfFigures = \mt_rand(100, 120);
+			$amountOfFigures = rand(100, 120);
 		}
 
 		for ($i = 0; $i < $amountOfFigures; $i++) {
-			$figure = mt_rand(0, count($figures) -1);
-			$color = mt_rand(0, count($colors) - 1);
+			$figure = rand(0, count($figures) -1);
+			$color = rand(0, count($colors) - 1);
 			$this->figures[] = $this->getRandomFigure($figures[$figure], $colors[$color]);
 		}
 	}
@@ -78,7 +78,7 @@ class Image
 			$coord = $this->getRandomCoordinates(true);
 			$x = $coord['x'];
 			$y = $coord['y'];
-			$tilt = mt_rand(95, 100) / 100;
+			$tilt = rand(95, 100) / 100;
 			$this->pivot = $this->imageFilter($this->pivot);
 			$this->pivot = $this->perspective($this->pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
 			$stamp = $this->pivot;
@@ -165,8 +165,8 @@ class Image
 				$randomFigure = $this->getRandomString($color);
 				break;
 		}
-		if (mt_rand(0, 100) < $this->rotateChance) {
-			$deg = mt_rand(30, 80);
+		if (rand(0, 100) < $this->rotateChance) {
+			$deg = rand(30, 80);
 			$randomFigure->rotate($deg);
 		}
 
@@ -176,9 +176,9 @@ class Image
 
 	protected function getRandomSquare($color)
 	{
-		$width = mt_rand(20, 50);
+		$width = rand(20, 50);
 		$coordinates = $this->getRandomCoordinates();
-		$filled = mt_rand(0, 1);
+		$filled = rand(0, 1);
 		$figure = new Square(
 			$coordinates['x'],
 			$coordinates['y'],
@@ -192,9 +192,9 @@ class Image
 
 	protected function getRandomTriangle($color)
 	{
-		$length = mt_rand(20, 50);
+		$length = rand(20, 50);
 		$coordinates = $this->getRandomCoordinates();
-		$filled = mt_rand(0,1);
+		$filled = rand(0,1);
 		$figure = new RightTriangle($coordinates['x'], $coordinates['y'], $length, $color, $filled);
 		return $figure;
 	}
@@ -202,9 +202,9 @@ class Image
 
 	protected function getRandomCircle($color)
 	{
-		$length = mt_rand(20, 50);
+		$length = rand(20, 50);
 		$coordinates = $this->getRandomCoordinates();
-		$filled = mt_rand(0,1);
+		$filled = rand(0,1);
 		$figure = new Circle($coordinates['x'], $coordinates['y'], $length, $color, $filled);
 		return $figure;
 	}
@@ -229,7 +229,7 @@ class Image
 
 	protected function getRandomTiltSide()
 	{
-		return mt_rand(0,3);
+		return rand(0,3);
 	}
 
 
@@ -257,10 +257,10 @@ class Image
 
 	protected function imageFilter($img)
 	{
-		if (mt_rand(0, 100) < $this->filterChance) {
-			imagefilter($img, IMG_FILTER_BRIGHTNESS, mt_rand(-100, 100));
+		if (rand(0, 100) < $this->filterChance) {
+			imagefilter($img, IMG_FILTER_BRIGHTNESS, rand(-100, 100));
 		}
-		if (mt_rand(0, 100) < $this->filterChance) {
+		if (rand(0, 100) < $this->filterChance) {
 			imagefilter($img, IMG_FILTER_GAUSSIAN_BLUR);
 		}
 		return $img;
@@ -269,7 +269,7 @@ class Image
 
 	protected function getRandomCoordinate($limit = 0)
 	{
-		$coord = mt_rand(0, $limit);
+		$coord = rand(0, $limit);
 		return $coord;
 	}
 
