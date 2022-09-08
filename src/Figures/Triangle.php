@@ -1,11 +1,14 @@
 <?php
 
+namespace Volochaev\ImageGeneration\Figures;
+
 use Volochaev\ImageGeneration\Figures\Figure;
 use Volochaev\ImageGeneration\Helpers\HexToRGB;
 
 class Triangle extends Figure
 {
 	private $vertices = [];
+
 
 	public function __construct($verticies, $filled, $color)
 	{
@@ -16,14 +19,17 @@ class Triangle extends Figure
 		$this->color = is_string($color) ? HexToRGB::translate($color) : $color;
 	}
 
+
 	public function render($image)
 	{
+		$color = imagecolorallocate($image, $this->color[0], $this->color[1], $this->color[2]);
 		if ($this->filled) {
-			imagefilledpolygon($image, $this->vertices, count($this->vertices) / 2, $this->color);
+			imagefilledpolygon($image, $this->vertices, count($this->vertices) / 2, $color);
 			return;
 		}
-		imagepolygon($image, $this->vertices, count($this->vertices) / 2, $this->color);
+		imagepolygon($image, $this->vertices, count($this->vertices) / 2, $color);
 	}
+
 
 	public function rotate($deg)
 	{
@@ -49,6 +55,7 @@ class Triangle extends Figure
 		$this->vertices = $newVerticies;
 	}
 
+
 	public function getSquare($verticies)
 	{
 		$vertexA = $verticies[0];
@@ -59,5 +66,19 @@ class Triangle extends Figure
 		 ($vertexB[0] * ($vertexC[1] - $vertexA[1])) +
 		 ( $vertexC[0] * ($vertexA[1] - $vertexB[1]))
 		) / 2); 
+	}
+
+	public static function constructInArea($x, $y, $width, $height, $filled, $color)
+	{
+		$vertices = [];
+		for ($i = 1; $i <= 6; $i++) {
+			if ($i % 2 > 0) {
+				$vertices[] = rand($x, $x + $width);
+			} else {
+				$vertices[] = rand($y, $y + $height);
+			}
+		}
+
+		return new Triangle($vertices, $filled, $color);
 	}
 }

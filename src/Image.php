@@ -2,10 +2,12 @@
 
 namespace Volochaev\ImageGeneration;
 
+use Triangle;
 use Volochaev\ImageGeneration\Figures\Circle;
 use Volochaev\ImageGeneration\Figures\RightTriangle;
 use Volochaev\ImageGeneration\Figures\Square;
 use Volochaev\ImageGeneration\Figures\TextString;
+use Volochaev\ImageGeneration\Figures\Triangle as FiguresTriangle;
 use Volochaev\ImageGeneration\Helpers\HexToRGB;
 
 class Image
@@ -26,7 +28,8 @@ class Image
 		'circle',
 		'rightTriangle',
 		'square',
-		'string'
+		'string',
+		'triangle'
 	];
 	protected const FIGURES_COLORS = [
 		'#000000',
@@ -162,10 +165,13 @@ class Image
 				$randomFigure = $this->getRandomCircle($color);
 				break;
 			case 'rightTriangle':
-				$randomFigure = $this->getRandomTriangle($color);
+				$randomFigure = $this->getRandomRightTriangle($color);
 				break;
 			case 'string':
 				$randomFigure = $this->getRandomString($color);
+				break;
+			case 'triangle':
+				$randomFigure = $this->getRandomTriangle($color);
 				break;
 		}
 		if (rand(0, 100) < $this->rotateChance) {
@@ -193,12 +199,21 @@ class Image
 	}
 
 
-	protected function getRandomTriangle($color)
+	protected function getRandomRightTriangle($color)
 	{
 		$length = rand(20, 50);
 		$coordinates = $this->getRandomCoordinates();
 		$filled = rand(0,1);
 		$figure = new RightTriangle($coordinates['x'], $coordinates['y'], $length, $color, $filled);
+		return $figure;
+	}
+
+	protected function getRandomTriangle($color)
+	{
+		$width = rand(20,50);
+		$coordinates = $this->getRandomCoordinates();
+		$filled = rand(0,1);
+		$figure = FiguresTriangle::constructInArea($coordinates['x'], $coordinates['y'], $width, $width, $filled, $color);
 		return $figure;
 	}
 
