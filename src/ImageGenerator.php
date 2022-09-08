@@ -26,9 +26,12 @@ class ImageGenerator
 		'bottom_right',
 	];
 
+	protected $backgrounds;
+
 
 	public function __construct()
 	{
+		$this->backgrounds = $this->loadBackgrounds();
 	}
 
 
@@ -43,11 +46,11 @@ class ImageGenerator
 		for ($i = 0; $i < $amount; $i++) {
 			$image = null;
 			if ($i < $amount / 3) {
-				$image = new Image(512, 512, $this->getRandomColor());
+				$image = new Image(512, 512, $this->getRandomColor(), $this->getBackground());
 			} elseif ($i < $amount / 3 * 2) {
-				$image = new Image(768, 768, $this->getRandomColor());
+				$image = new Image(768, 768, $this->getRandomColor(), $this->getBackground());
 			} else {
-				$image = new Image(1024, 1024, $this->getRandomColor());
+				$image = new Image(1024, 1024, $this->getRandomColor(), $this->getBackground());
 			}
 			$image->addFigures();
 			$image->drawFigures();
@@ -62,6 +65,17 @@ class ImageGenerator
 		$colors = static::COLORS;
 		$colorIndex = rand(0, count($colors) - 1);
 		return $colors[$colorIndex];
+	}
+
+	private function getBackground()
+	{
+		$background = '';
+		$backgroundsSize = count($this->backgrounds);
+		if ($backgroundsSize) {
+			$randomIndex = rand(0, $backgroundsSize - 1);
+			return $this->backgrounds[$randomIndex];
+		}
+		return $background;
 	}
 
 
@@ -97,5 +111,33 @@ class ImageGenerator
 			return true;
 		}
 		return mkdir(__DIR__ . '/../dataset');
+	}
+
+
+	private function checkBackgroundDir()
+	{
+		if (is_dir(__DIR__ . '/../backgrounds/')) {
+			return true;
+		}
+		return mkdir(__DIR__ . '/../dataset');
+	}
+
+	private function loadBackgrounds()
+	{
+		$this->checkBackgroundDir();
+		$path = __DIR__ . '/../backgrounds/';
+		$files = scandir($path);
+		$objects = [];
+		foreach ($files as $file) {
+			$ext = explode('.', $file);
+			if (count($ext) > 1) {
+				$ext = $ext[count($ext) - 1];
+				$regex = '/(png|jpg|gif|jpeg)/';
+				if (preg_match($regex, $file)) {
+					$objects[] = $path . $file;
+				}
+			}
+		}
+		return $objects;
 	}
 }

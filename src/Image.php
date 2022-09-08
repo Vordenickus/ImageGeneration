@@ -9,6 +9,7 @@ use Volochaev\ImageGeneration\Figures\Square;
 use Volochaev\ImageGeneration\Figures\TextString;
 use Volochaev\ImageGeneration\Figures\Triangle as FiguresTriangle;
 use Volochaev\ImageGeneration\Helpers\HexToRGB;
+use Volochaev\ImageGeneration\Helpers\LoadImage;
 
 class Image
 {
@@ -22,6 +23,7 @@ class Image
 	protected $filterChance = 40;
 	protected $label = '';
 	protected $pivot;
+	protected $backgroundImage;
 	protected $occupied = ['x' => [], 'y' => []];
 
 	protected const FIGURES = [
@@ -40,7 +42,7 @@ class Image
 	];
 
 
-	public function __construct($width, $height, $background)
+	public function __construct($width, $height, $background, $backgroundImage = '')
 	{
 		$this->width = $width;
 		$this->height = $height;
@@ -49,8 +51,16 @@ class Image
 		$this->pivot = imagecreatefrompng(__DIR__ . '/../ideal/scan-mark.png');
 		$this->background = $this->allocateCollor($this->image, $background);
 		$this->hexBackground = $background;
-
-		imagefill($this->image, 0, 0, $this->background);
+		if ($backgroundImage) {
+			$image = LoadImage::loadImage($backgroundImage);
+			if (!$image) {
+				imagefill($this->image, 0, 0, $this->background);
+			}
+			$this->backgroundImage = $image;
+			$this->applyBackgroundImage();
+		} else {
+			imagefill($this->image, 0, 0, $this->background);
+		}
 	}
 
 
@@ -313,6 +323,19 @@ class Image
 				$this->occupied['y'][] = $deltaMinus;
 			}
 		}
+	}
+
+
+	protected function applyBackgroundImage()
+	{
+		$background = $this->backgroundImage;
+		$image = $this->image;
+
+		$background = imagescale($background, imagesx($image), imagesy($image));
+
+		imagedestroy($this->backgroundImage);
+		imagecopy($image, $background, 0, 0, 0, 0, imagesx($image), imagesy($image));
+		imagedestroy($background);
 	}
 
 
