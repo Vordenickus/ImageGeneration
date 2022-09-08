@@ -10,5 +10,8 @@
             "name": "Волочаев Даниил",
             "email": "volochaev@techart.ru"
         }
-    ]
+    ],
+    "require": {
+        "ext-gd": "*"
+    }
 }

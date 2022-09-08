@@ -77,8 +77,8 @@ class ImageGenerator
 
 	private function createDir() {
 		if (is_dir(__DIR__ . "/../dataset")) {
-			return;
+			return true;
 		}
-		mkdir(__DIR__ . '/../dataset');
+		return mkdir(__DIR__ . '/../dataset');
 	}
 }
