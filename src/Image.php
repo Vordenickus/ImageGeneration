@@ -22,6 +22,20 @@ class Image
 	protected $pivot;
 	protected $occupied = ['x' => [], 'y' => []];
 
+	protected const FIGURES = [
+		'circle',
+		'rightTriangle',
+		'square',
+		'string'
+	];
+	protected const FIGURES_COLORS = [
+		'#000000',
+		'#f34044',
+		'#734f34',
+		'#fd3292',
+		'#f09746'
+	];
+
 
 	public function __construct($width, $height, $background)
 	{
@@ -39,26 +53,15 @@ class Image
 
 	public function addFigures()
 	{
-		$figures = [
-			'circle',
-			'rightTriangle',
-			'square',
-			'string'
-		];
-		$colors = [
-			'#000000',
-			'#f34044',
-			'#734f34',
-			'#fd3292',
-			'#f09746'
-		];
+		$figures = static::FIGURES;
+		$colors = static::FIGURES_COLORS;
 		$amountOfFigures = 0;
 		if ($this->width === 512) {
-			$amountOfFigures = rand(50,70);
+			$amountOfFigures = rand(60,80);
 		} elseif ($this->width === 768) {
-			$amountOfFigures = rand(60, 100);
+			$amountOfFigures = rand(80, 120);
 		} elseif ($this->width === 1024) {
-			$amountOfFigures = rand(100, 120);
+			$amountOfFigures = rand(120, 150);
 		}
 
 		for ($i = 0; $i < $amountOfFigures; $i++) {
@@ -75,7 +78,7 @@ class Image
 		for($i = 0; $i < 4; $i++) {
 			$sx = imagesx($this->pivot);
 			$sy = imagesy($this->pivot);
-			$coord = $this->getRandomCoordinates(true);
+			$coord = $this->getRandomCoordinates(true, $sx);
 			$x = $coord['x'];
 			$y = $coord['y'];
 			$tilt = rand(95, 100) / 100;
@@ -233,10 +236,10 @@ class Image
 	}
 
 
-	protected function getRandomCoordinates($unique = false) {
-		$x = $this->getRandomX();
-		$y = $this->getRandomY();
-		if ($unique && in_array($x, $this->occupied['x']) && \in_array($y, $this->occupied['y'])) {
+	protected function getRandomCoordinates($unique = true, $width = 0) {
+		$x = $this->getRandomX($width);
+		$y = $this->getRandomY($width);
+		if ($unique && ((in_array($x, $this->occupied['x'])) && (in_array($y, $this->occupied['y'])))) {
 			return $this->getRandomCoordinates($unique);
 		}
 		return ['x' => $x,'y' => $y];
@@ -245,13 +248,15 @@ class Image
 
 	protected function getRandomX($width = 0)
 	{
-		return $this->getRandomCoordinate($width === 0 ? $this->width : $width, 'x');
+		$width = $width === 0 ? ($this->width) : ($this->width - $width);
+		return $this->getRandomCoordinate($width);
 	}
 
 
 	protected function getRandomY($height = 0)
 	{
-		return $this->getRandomCoordinate($height === 0 ? $this->height : $height, 'y');
+		$height = $height === 0 ? ($this->height) : ($this->height - $height);
+		return $this->getRandomCoordinate($height);
 	}
 
 
@@ -288,9 +293,9 @@ class Image
 		for ($i = 0; $i < $height; $i++) {
 			$deltaPlus = $y + $i;
 			$deltaMinus = $y - $i;
-			$this->occupied['x'][0] = $deltaPlus;
+			$this->occupied['y'][0] = $deltaPlus;
 			if ($deltaMinus !== $deltaPlus) {
-				$this->occupied['x'][] = $deltaMinus;
+				$this->occupied['y'][] = $deltaMinus;
 			}
 		}
 	}
