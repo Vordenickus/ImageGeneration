@@ -3,6 +3,7 @@
 namespace Volochaev\ImageGeneration;
 
 use Volochaev\ImageGeneration\Config\ConfigLoader;
+use Volochaev\ImageGeneration\Figures\Angle;
 use Volochaev\ImageGeneration\Figures\Circle;
 use Volochaev\ImageGeneration\Figures\Poligon;
 use Volochaev\ImageGeneration\Figures\RightTriangle;
@@ -34,7 +35,8 @@ class Image
 		'square',
 		'string',
 		'triangle',
-		'poligon'
+		'poligon',
+		'angle'
 	];
 	protected const FIGURES_COLORS = [
 		'#000000',
@@ -143,10 +145,6 @@ class Image
 				$qr->rotate($deg);
 			}
 			$qr = $qr->getImage();
-			//$color = \imagecolorallocate($qr, 255, 255, 255);
-			//$qr = \imagerotate($qr, 40, $color);
-			//\imagepng($qr, 'ff.png');
-			//die();
 			$width = imagesx($qr);
 			$height = imagesy($qr);
 			$coordinates = $this->getRandomCoordinates(true, $width, $height);
@@ -241,6 +239,9 @@ class Image
 			case 'poligon':
 				$randomFigure = $this->getRandomPoligon($color);
 				break;
+			case 'angle':
+				$randomFigure = $this->getRandomAngle($color);
+				break;
 		}
 		if (rand(0, 100) < $this->rotateChance) {
 			$deg = rand(30, 80);
@@ -324,6 +325,15 @@ class Image
 	}
 
 
+	protected function getRandomAngle($color)
+	{
+		$width = rand(40, 60);
+		$coordinates = $this->getRandomCoordinates();
+		$figure = new Angle($coordinates['x'], $coordinates['y'], $width, $width, $color);
+		return $figure;
+	}
+
+
 	protected function allocateCollor($image, $color)
 	{
 		if (is_string($color)) {
@@ -370,6 +380,10 @@ class Image
 
 	protected function imageFilter($img)
 	{
+		if (rand(0, 100) < $this->filterChance) {
+			$tilt = rand($this->maxTilt, 100);
+			$this->perspective($img, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
+		}
 		if (rand(0, 100) < $this->filterChance) {
 			imagefilter($img, IMG_FILTER_BRIGHTNESS, rand(-100, 100));
 		}
