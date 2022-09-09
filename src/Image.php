@@ -138,7 +138,8 @@ class Image
 		}
 
 		for ($i = 0; $i < $amount; $i++) {
-			$qr = $this->qrGenerator->createQr();
+			$randomScale = ConfigLoader::cfg('QR_SCALE');
+			$qr = $this->qrGenerator->createQr($randomScale);
 			if (rand(0, 100) < $this->rotateChance) {
 				$deg = rand(0, 360);
 				$qr->rotate($deg);

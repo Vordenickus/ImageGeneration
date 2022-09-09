@@ -15,10 +15,13 @@ class Qr
 	protected $hash;
 
 
-	public function __construct($hash)
+	public function __construct($hash, $randomScale = false)
 	{
 		$this->hash = $hash;
 		$this->image = $this->generate();
+		if ($randomScale) {
+			$this->image = $this->rescale(rand(70, 130) / 100);
+		}
 	}
 
 	protected function generate()
@@ -66,10 +69,8 @@ class Qr
 	public function rescale($factor)
 	{
 		$width = imagesx($this->image);
-		$height = imagesy($this->image);
 		$width *= $factor;
-		$height *= $factor;
-		return imagescale($this->image, $width, $height);
+		return imagescale($this->image, $width);
 	}
 
 

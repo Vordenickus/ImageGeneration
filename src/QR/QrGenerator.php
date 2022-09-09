@@ -9,10 +9,10 @@ class QrGenerator
 	}
 
 
-	public function createQr()
+	public function createQr($randomScale = false)
 	{
 		$hash = $this->getRandomHash();
-		$qr = new Qr($hash);
+		$qr = new Qr($hash, $randomScale);
 
 		return $qr;
 	}
