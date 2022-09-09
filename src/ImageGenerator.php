@@ -42,10 +42,14 @@ class ImageGenerator
 	{
 		$this->createDir();
 		if ($cleadDir) {
+			print('Удаление старого датасета' . PHP_EOL);
 			$this->clear();
 		}
 		$this->generateLabelMap();
 		$image = null;
+		print("Начало генерации датасета размером в $amount изображений" . PHP_EOL);
+		$now = microtime(true);
+		$prediction = 0;
 		for ($i = 0; $i < $amount; $i++) {
 			$image = null;
 			if ($i < $amount / 3) {
@@ -60,7 +64,22 @@ class ImageGenerator
 			$image->addPivots();
 			$image->addQr($this->amountOfQr);
 			$image->generateAndSave();
+			if ($i == round($amount / 4)) {
+				$elapsed = round(microtime(true) - $now, 2);
+				$prediction = round($elapsed * 3, 2);
+				print("25%, прошло $elapsed с, осталось ~ $prediction с" . PHP_EOL);
+			} else if ($i == round($amount / 2)) {
+				$elapsed = round(microtime(true) - $now, 2);
+				$prediction = $elapsed;
+				print("50%, прошло $elapsed с, осталось ~ $prediction с" . PHP_EOL);
+			} elseif ($i == round($amount / 4 * 3)) {
+				$elapsed = round(microtime(true) - $now, 2);
+				$prediction = round($elapsed / 3, 2);
+				print("75%, прошло $elapsed с, осталось ~ $prediction с" . PHP_EOL);
+			}
 		}
+		$elapsed = round(microtime(true) - $now, 2);
+		print("Генерация завершена за $elapsed s" . PHP_EOL);
 	}
 
 
@@ -114,6 +133,7 @@ class ImageGenerator
 		if (is_dir(__DIR__ . "/../dataset")) {
 			return true;
 		}
+		print('Нарушена файловая структура. Восстановление' . PHP_EOL);
 		return mkdir(__DIR__ . '/../dataset');
 	}
 
@@ -123,7 +143,7 @@ class ImageGenerator
 		if (is_dir(__DIR__ . '/../backgrounds/')) {
 			return true;
 		}
-		return mkdir(__DIR__ . '/../dataset');
+		return mkdir(__DIR__ . '/../backgrounds/');
 	}
 
 	private function loadBackgrounds()
