@@ -15,7 +15,7 @@ final class ConfigLoader
 	public static function cfg($key)
 	{
 		if (key_exists($key, static::$config)) {
-			return static::$config['key'];
+			return static::$config[$key];
 		}
 		return '';
 	}

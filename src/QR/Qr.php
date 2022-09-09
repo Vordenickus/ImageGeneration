@@ -39,8 +39,23 @@ class Qr
 
 	public function rotate($deg)
 	{
+		$width = imagesx($this->image);
+		$height = imagesy($this->image);
 		$white = imagecolorallocate($this->image, 255, 255, 255);
 		$this->image = imagerotate($this->image, $deg, $white);
+		$newWidth = imagesx($this->image);
+		$newHeight = imagesy($this->image);
+		$deltaWidth = abs($width - $newWidth);
+		$deltaHeight = abs($height - $newHeight);
+		$this->image = imagecrop(
+			$this->image,
+			[
+				'x'=> $deltaWidth / 2,
+				'y' => $deltaHeight / 2,
+				'width' => $width,
+				'height' => $height
+			]
+		);
 	}
 
 	public function getImage()

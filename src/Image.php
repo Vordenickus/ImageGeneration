@@ -143,6 +143,10 @@ class Image
 				$qr->rotate($deg);
 			}
 			$qr = $qr->getImage();
+			//$color = \imagecolorallocate($qr, 255, 255, 255);
+			//$qr = \imagerotate($qr, 40, $color);
+			//\imagepng($qr, 'ff.png');
+			//die();
 			$width = imagesx($qr);
 			$height = imagesy($qr);
 			$coordinates = $this->getRandomCoordinates(true, $width, $height);
