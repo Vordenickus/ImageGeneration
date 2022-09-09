@@ -101,4 +101,11 @@ final class ConfigLoader
 		}
 		return $string;
 	}
+
+
+
+	public static function addRule($key, $value)
+	{
+		static::$config[$key] = $value;
+	}
 }
