@@ -2,6 +2,7 @@
 
 namespace Volochaev\ImageGeneration;
 
+use Volochaev\ImageGeneration\Config\ConfigLoader;
 use Volochaev\ImageGeneration\Image;
 class ImageGenerator
 {
@@ -20,18 +21,18 @@ class ImageGenerator
 	];
 
 	protected const LABELS = [
-		'upper_left',
-		'upper_right',
-		'bottom_left',
-		'bottom_right',
+		'qr_mark',
+		'qr'
 	];
 
 	protected $backgrounds;
+	protected $amountOfQr;
 
 
 	public function __construct()
 	{
 		$this->backgrounds = $this->loadBackgrounds();
+		$this->amountOfQr = ConfigLoader::cfg('AMOUNTS_OF_QR') ?? 1;
 	}
 
 
@@ -55,7 +56,7 @@ class ImageGenerator
 			$image->addFigures();
 			$image->drawFigures();
 			$image->addPivots();
-			$image->addQr(1);
+			$image->addQr($this->amountOfQr);
 			$image->generateAndSave();
 		}
 	}
