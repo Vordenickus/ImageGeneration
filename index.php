@@ -1,10 +1,28 @@
 <?php
 
-use Volochaev\ImageGeneration\ImageGenerator;
-
 include('./vendor/autoload.php');
 
-error_reporting(E_ALL ^ E_DEPRECATED ^ E_WARNING);
+use Volochaev\ImageGeneration\ImageGenerator;
+use Volochaev\ImageGeneration\QR\QrGenerator;
 
-$image = new ImageGenerator();
-$image->generateDataset(300);
+$originalLocale = setlocale(LC_ALL, 0);
+
+setConfig();
+
+try {
+	$image = new ImageGenerator();
+	$image->generateDataset(30);
+} finally {
+	configReturn($originalLocale);
+}
+
+function setConfig()
+{
+	error_reporting(E_ALL ^ E_DEPRECATED ^ E_WARNING);
+	setlocale(LC_ALL, "C");
+}
+
+function configReturn($locale)
+{
+	setlocale(LC_ALL, $locale);
+}

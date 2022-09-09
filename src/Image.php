@@ -10,17 +10,18 @@ use Volochaev\ImageGeneration\Figures\TextString;
 use Volochaev\ImageGeneration\Figures\Triangle;
 use Volochaev\ImageGeneration\Helpers\HexToRGB;
 use Volochaev\ImageGeneration\Helpers\LoadImage;
+use Volochaev\ImageGeneration\QR\QrGenerator;
 
 class Image
 {
 	public $width;
 	public $height;
+
+	protected $qrGenerator;
 	protected $background;
 	protected $hexBackground;
 	protected $image;
 	protected $figures = [];
-	protected $rotateChance = 40;
-	protected $filterChance = 40;
 	protected $label = '';
 	protected $pivot;
 	protected $backgroundImage;
@@ -42,6 +43,10 @@ class Image
 		'#f09746'
 	];
 
+	protected const MAX_TILT = 70;
+	protected const ROTATE_CHANCE = 40;
+	protected const FILTER_CHANCE = 40;
+
 
 	public function __construct($width, $height, $background, $backgroundImage = '')
 	{
@@ -50,8 +55,7 @@ class Image
 
 		$this->image = imagecreatetruecolor($this->width, $this->height);
 		$this->pivot = imagecreatefrompng(__DIR__ . '/../ideal/scan-mark.png');
-		$this->background = $this->allocateCollor($this->image, $background);
-		$this->hexBackground = $background;
+		$this->qrGenerator = new QrGenerator();
 		if ($backgroundImage) {
 			$image = LoadImage::loadImage($backgroundImage);
 			if (!$image) {
@@ -61,6 +65,10 @@ class Image
 			$this->applyBackgroundImage();
 		} else {
 			imagefill($this->image, 0, 0, $this->background);
+		}
+		if ($background) {
+			$this->background = $this->allocateCollor($this->image, $background);
+			$this->hexBackground = $background;
 		}
 	}
 
@@ -95,7 +103,7 @@ class Image
 			$coord = $this->getRandomCoordinates(true, $sx);
 			$x = $coord['x'];
 			$y = $coord['y'];
-			$tilt = rand(95, 100) / 100;
+			$tilt = rand(static::MAX_TILT, 100) / 100;
 			$this->pivot = $this->imageFilter($this->pivot);
 			$this->pivot = $this->perspective($this->pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
 			$stamp = $this->pivot;
@@ -112,6 +120,43 @@ class Image
 				0,
 				imagesx($stamp),
 				imagesy($stamp)
+			);
+		}
+	}
+
+
+	public function addQr($amount = -1)
+	{
+		if ($amount === -1) {
+			$amount = rand(1, 3);
+		}
+
+		for ($i = 0; $i < $amount; $i++) {
+			$qr = $this->qrGenerator->createQr();
+			if (rand(0, 100) < static::ROTATE_CHANCE) {
+				$deg = rand(0, 360);
+				$qr->rotate($deg);
+			}
+			$qr = $qr->getImage();
+			$width = imagesx($qr);
+			$height = imagesy($qr);
+			$coordinates = $this->getRandomCoordinates(true, $width, $height);
+			$x = $coordinates['x'];
+			$y = $coordinates['y'];
+
+			$this->addToOccupied($x, $y, $width, $width);
+
+			$qr = $this->imageFilter($qr);
+
+			imagecopy(
+				$this->image,
+				$qr,
+				$x,
+				$y,
+				0,
+				0,
+				$width,
+				$height
 			);
 		}
 	}
@@ -165,6 +210,14 @@ class Image
 	}
 
 
+	protected function filterQr($qr)
+	{
+		if (rand(0, 100) < static::ROTATE_CHANCE) {
+
+		}
+	}
+
+
 	protected function getRandomFigure($figure, $color)
 	{
 		$randomFigure = null;
@@ -188,7 +241,7 @@ class Image
 				$randomFigure = $this->getRandomPoligon($color);
 				break;
 		}
-		if (rand(0, 100) < $this->rotateChance) {
+		if (rand(0, 100) < static::ROTATE_CHANCE) {
 			$deg = rand(30, 80);
 			$randomFigure->rotate($deg);
 		}
@@ -285,9 +338,9 @@ class Image
 	}
 
 
-	protected function getRandomCoordinates($unique = true, $width = 0) {
+	protected function getRandomCoordinates($unique = true, $width = 0, $height = 0) {
 		$x = $this->getRandomX($width);
-		$y = $this->getRandomY($width);
+		$y = $this->getRandomY($height !== 0 ? $height : $width);
 		if (
 			$unique &&
 			(
@@ -316,10 +369,10 @@ class Image
 
 	protected function imageFilter($img)
 	{
-		if (rand(0, 100) < $this->filterChance) {
+		if (rand(0, 100) < static::FILTER_CHANCE) {
 			imagefilter($img, IMG_FILTER_BRIGHTNESS, rand(-100, 100));
 		}
-		if (rand(0, 100) < $this->filterChance) {
+		if (rand(0, 100) < static::FILTER_CHANCE) {
 			imagefilter($img, IMG_FILTER_GAUSSIAN_BLUR);
 		}
 		return $img;

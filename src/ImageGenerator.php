@@ -52,9 +52,10 @@ class ImageGenerator
 			} else {
 				$image = new Image(1024, 1024, $this->getRandomColor(), $this->getBackground());
 			}
-			$image->addFigures();
-			$image->drawFigures();
-			$image->addPivots();
+			//$image->addFigures();
+			//$image->drawFigures();
+			//$image->addPivots();
+			$image->addQr(1);
 			$image->generateAndSave();
 		}
 	}
