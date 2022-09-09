@@ -5,6 +5,11 @@ include('./vendor/autoload.php');
 use Volochaev\ImageGeneration\Config\ArgumentsParser;
 use Volochaev\ImageGeneration\Config\ConfigLoader;
 use Volochaev\ImageGeneration\ImageGenerator;
+use Volochaev\ImageGeneration\Logging\Logger;
+
+$logger = Logger::getInstance('file');
+
+$logger->setAccept(['ERROR', 'INFO', 'WARN']);
 
 $originalLocale = setlocale(LC_ALL, 0);
 
