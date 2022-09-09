@@ -84,13 +84,12 @@ class Image
 	{
 		$figures = static::FIGURES;
 		$colors = static::FIGURES_COLORS;
-		$amountOfFigures = 0;
 		if ($this->width === 512) {
-			$amountOfFigures = $amountOfFigures === -1 ? rand(60,80) : $amountOfFigures;
+			$amountOfFigures = $amountOfFigures == -1 ? rand(60,80) : $amountOfFigures;
 		} elseif ($this->width === 768) {
-			$amountOfFigures = $amountOfFigures === -1 ? rand(80, 120) : ceil($amountOfFigures * 1.4);
+			$amountOfFigures = $amountOfFigures == -1 ? rand(80, 120) : ceil($amountOfFigures * 1.4);
 		} elseif ($this->width === 1024) {
-			$amountOfFigures = $amountOfFigures === -1 ? rand(120, 150) : ceil($amountOfFigures * 1.8);
+			$amountOfFigures = $amountOfFigures == -1 ? rand(120, 150) : ceil($amountOfFigures * 1.8);
 		}
 		for ($i = 0; $i < $amountOfFigures; $i++) {
 			$figure = rand(0, count($figures) -1);
