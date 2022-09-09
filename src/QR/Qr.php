@@ -7,7 +7,7 @@ use BaconQrCode\Writer;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-
+use Volochaev\ImageGeneration\Helpers\HexToRGB;
 
 class Qr
 {
@@ -47,16 +47,31 @@ class Qr
 		$newHeight = imagesy($this->image);
 		$deltaWidth = abs($width - $newWidth);
 		$deltaHeight = abs($height - $newHeight);
-		$this->image = imagecrop(
+
+		$this->image = imagecrop( // отрезаем часть после смещения
 			$this->image,
 			[
-				'x'=> $deltaWidth / 2,
-				'y' => $deltaHeight / 2,
+				'x'=> $deltaWidth / 2, // Смещение вправо
+				'y' => $deltaHeight / 2, // Смещение вниз
 				'width' => $width,
 				'height' => $height
 			]
 		);
 	}
+
+
+	/**
+	 * @var float $factor фактор скалирования
+	 */
+	public function rescale($factor)
+	{
+		$width = imagesx($this->image);
+		$height = imagesy($this->image);
+		$width *= $factor;
+		$height *= $factor;
+		return imagescale($this->image, $width, $height);
+	}
+
 
 	public function getImage()
 	{

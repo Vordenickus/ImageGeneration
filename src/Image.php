@@ -115,7 +115,7 @@ class Image
 			$this->pivot = $this->perspective($this->pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
 			$stamp = $this->pivot;
 			$stamp = imagerotate($stamp, $deg[$i], $this->background);
-			$label = $this->calculateLabel($x, $y, imagesx($stamp), imagesx($stamp), $i);
+			$label = $this->calculateLabel($x, $y, imagesx($stamp), imagesx($stamp), 0);
 			$this->label .= $label . PHP_EOL;
 			$this->addToOccupied($x, $y, $sx, $sy);
 			imagecopy(
@@ -165,6 +165,10 @@ class Image
 				$width,
 				$height
 			);
+
+			$label = $this->calculateLabel($x, $y, imagesx($qr), imagesy($qr), 1);
+			$this->label .= $label . PHP_EOL;
+			imagedestroy($qr);
 		}
 	}
 
