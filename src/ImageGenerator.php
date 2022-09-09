@@ -27,12 +27,14 @@ class ImageGenerator
 
 	protected $backgrounds;
 	protected $amountOfQr;
+	protected $amountOfFigures;
 
 
 	public function __construct()
 	{
 		$this->backgrounds = $this->loadBackgrounds();
 		$this->amountOfQr = ConfigLoader::cfg('AMOUNTS_OF_QR') ?? 1;
+		$this->amountOfFigures = ConfigLoader::cfg('AMOUNTS_OF_FIGURES') ?? -1;
 	}
 
 
@@ -53,7 +55,7 @@ class ImageGenerator
 			} else {
 				$image = new Image(1024, 1024, $this->getRandomColor(), $this->getBackground());
 			}
-			$image->addFigures();
+			$image->addFigures($this->amountOfFigures);
 			$image->drawFigures();
 			$image->addPivots();
 			$image->addQr($this->amountOfQr);
