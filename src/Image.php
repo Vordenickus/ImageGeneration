@@ -12,12 +12,15 @@ use Volochaev\ImageGeneration\Figures\TextString;
 use Volochaev\ImageGeneration\Figures\Triangle;
 use Volochaev\ImageGeneration\Helpers\HexToRGB;
 use Volochaev\ImageGeneration\Helpers\LoadImage;
+use Volochaev\ImageGeneration\Logging\Logger;
 use Volochaev\ImageGeneration\QR\QrGenerator;
 
 class Image
 {
 	public $width;
 	public $height;
+
+	private $logger;
 
 	protected $qrGenerator;
 	protected $background;
@@ -77,6 +80,8 @@ class Image
 			$this->background = $this->allocateCollor($this->image, $background);
 			$this->hexBackground = $background;
 		}
+
+		$this->logger = Logger::getInstance();
 	}
 
 
@@ -214,9 +219,15 @@ class Image
 			$labelStream = fopen($labelName, 'w+');
 			try {
 				fwrite($labelStream, $this->label);
+			} catch(\Exception $ex) {
+				$string = 'code: ' . $ex->getCode() . '; msg: ' . $ex->getMessage();
+				$this->logger->error($string);
 			} finally {
 				fclose($labelStream);
 			}
+		} catch(\Exception $ex) {
+			$string = 'code: ' . $ex->getCode() . '; msg: ' . $ex->getMessage();
+			$this->logger->error($string);
 		} finally {
 			fclose($binaryStream);
 			imagedestroy($this->image);

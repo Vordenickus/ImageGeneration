@@ -3,9 +3,13 @@
 namespace Volochaev\ImageGeneration\Config;
 
 use RuntimeException;
+use Volochaev\ImageGeneration\Exceptions\ConfigLoadException;
+use Volochaev\ImageGeneration\Logging\Logger;
 
 final class ConfigLoader
 {
+
+	private static $logger;
 
 	private static $path = __DIR__ . '/../../.cfg';
 	private static $pathDefault = __DIR__ . '/../../.default.cfg';
@@ -31,6 +35,7 @@ final class ConfigLoader
 			$rawConfig = self::readFile(static::$path);
 		}
 		static::$config = self::parseConfig($rawConfig);
+		static::$logger = Logger::getInstance();
 	}
 
 
@@ -96,6 +101,9 @@ final class ConfigLoader
 				$string .= fread($stream, $step);
 				$curStep += $step;
 			}
+		} catch(\Exception $ex) {
+			$string = 'code: ' . $ex->getCode() . '; msg: ' . $ex->getMessage();
+			$this->logger->error($string);
 		} finally {
 			fclose($stream);
 		}

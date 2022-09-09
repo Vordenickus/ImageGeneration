@@ -121,6 +121,9 @@ class ImageGenerator
 			foreach (static::LABELS as $label) {
 				fwrite($stream, $label . PHP_EOL);
 			}
+		} catch(\Exception $ex) {
+			$string = 'code: ' . $ex->getCode() . '; msg: ' . $ex->getMessage();
+			$this->logger->error($string);
 		} finally {
 			fclose($stream);
 		}
