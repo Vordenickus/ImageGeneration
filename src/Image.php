@@ -2,6 +2,7 @@
 
 namespace Volochaev\ImageGeneration;
 
+use Volochaev\ImageGeneration\Config\ConfigLoader;
 use Volochaev\ImageGeneration\Figures\Circle;
 use Volochaev\ImageGeneration\Figures\Poligon;
 use Volochaev\ImageGeneration\Figures\RightTriangle;
@@ -43,15 +44,19 @@ class Image
 		'#f09746'
 	];
 
-	protected const MAX_TILT = 70;
-	protected const ROTATE_CHANCE = 40;
-	protected const FILTER_CHANCE = 40;
+	protected $maxTilt;
+	protected $rotateChance;
+	protected $filterChance;
 
 
 	public function __construct($width, $height, $background, $backgroundImage = '')
 	{
 		$this->width = $width;
 		$this->height = $height;
+
+		$this->maxTilt = ConfigLoader::cfg("MAX_TILT") ?? 100;
+		$this->rotateChance = ConfigLoader::cfg("ROTATE_CHANCE") ?? 0;
+		$this->filterChance = ConfigLoader::cfg("FILTER_CHANCE") ?? 0;
 
 		$this->image = imagecreatetruecolor($this->width, $this->height);
 		$this->pivot = imagecreatefrompng(__DIR__ . '/../ideal/scan-mark.png');
@@ -103,7 +108,7 @@ class Image
 			$coord = $this->getRandomCoordinates(true, $sx);
 			$x = $coord['x'];
 			$y = $coord['y'];
-			$tilt = rand(static::MAX_TILT, 100) / 100;
+			$tilt = rand($this->maxTilt, 100) / 100;
 			$this->pivot = $this->imageFilter($this->pivot);
 			$this->pivot = $this->perspective($this->pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
 			$stamp = $this->pivot;
@@ -133,7 +138,7 @@ class Image
 
 		for ($i = 0; $i < $amount; $i++) {
 			$qr = $this->qrGenerator->createQr();
-			if (rand(0, 100) < static::ROTATE_CHANCE) {
+			if (rand(0, 100) < $this->rotateChance) {
 				$deg = rand(0, 360);
 				$qr->rotate($deg);
 			}
@@ -210,14 +215,6 @@ class Image
 	}
 
 
-	protected function filterQr($qr)
-	{
-		if (rand(0, 100) < static::ROTATE_CHANCE) {
-
-		}
-	}
-
-
 	protected function getRandomFigure($figure, $color)
 	{
 		$randomFigure = null;
@@ -241,7 +238,7 @@ class Image
 				$randomFigure = $this->getRandomPoligon($color);
 				break;
 		}
-		if (rand(0, 100) < static::ROTATE_CHANCE) {
+		if (rand(0, 100) < $this->rotateChance) {
 			$deg = rand(30, 80);
 			$randomFigure->rotate($deg);
 		}
@@ -369,10 +366,10 @@ class Image
 
 	protected function imageFilter($img)
 	{
-		if (rand(0, 100) < static::FILTER_CHANCE) {
+		if (rand(0, 100) < $this->filterChance) {
 			imagefilter($img, IMG_FILTER_BRIGHTNESS, rand(-100, 100));
 		}
-		if (rand(0, 100) < static::FILTER_CHANCE) {
+		if (rand(0, 100) < $this->filterChance) {
 			imagefilter($img, IMG_FILTER_GAUSSIAN_BLUR);
 		}
 		return $img;

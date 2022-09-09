@@ -2,10 +2,12 @@
 
 include('./vendor/autoload.php');
 
+use Volochaev\ImageGeneration\Config\ConfigLoader;
 use Volochaev\ImageGeneration\ImageGenerator;
-use Volochaev\ImageGeneration\QR\QrGenerator;
 
 $originalLocale = setlocale(LC_ALL, 0);
+
+ConfigLoader::loadConfig();
 
 setConfig();
 
