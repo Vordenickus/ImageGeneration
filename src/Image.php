@@ -84,11 +84,11 @@ class Image
 	{
 		$figures = static::FIGURES;
 		$colors = static::FIGURES_COLORS;
-		if ($this->width === 512) {
+		if ($this->width === 416) {
 			$amountOfFigures = $amountOfFigures == -1 ? rand(60,80) : $amountOfFigures;
-		} elseif ($this->width === 768) {
+		} elseif ($this->width === 624) {
 			$amountOfFigures = $amountOfFigures == -1 ? rand(80, 120) : ceil($amountOfFigures * 1.4);
-		} elseif ($this->width === 1024) {
+		} elseif ($this->width === 832) {
 			$amountOfFigures = $amountOfFigures == -1 ? rand(120, 150) : ceil($amountOfFigures * 1.8);
 		}
 		for ($i = 0; $i < $amountOfFigures; $i++) {
@@ -103,15 +103,16 @@ class Image
 	{
 		$deg = [0, 90, 180, 270];
 		for($i = 0; $i < 4; $i++) {
-			$sx = imagesx($this->pivot);
-			$sy = imagesy($this->pivot);
+			$pivot =imagescale($this->pivot, rand(30, 60));
+			$sx = imagesx($pivot);
+			$sy = imagesy($pivot);
 			$coord = $this->getRandomCoordinates(true, $sx);
 			$x = $coord['x'];
 			$y = $coord['y'];
 			$tilt = rand($this->maxTilt, 100) / 100;
-			$this->pivot = $this->imageFilter($this->pivot);
-			$this->pivot = $this->perspective($this->pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
-			$stamp = $this->pivot;
+			$pivot = $this->imageFilter($pivot);
+			$pivot = $this->perspective($pivot, $tilt, $this->getRandomTiltSide(), hexdec($this->hexBackground));
+			$stamp = $pivot;
 			$stamp = imagerotate($stamp, $deg[$i], $this->background);
 			$label = $this->calculateLabel($x, $y, imagesx($stamp), imagesx($stamp), 0);
 			$this->label .= $label . PHP_EOL;
@@ -126,6 +127,7 @@ class Image
 				imagesx($stamp),
 				imagesy($stamp)
 			);
+			imagedestroy($pivot);
 		}
 	}
 
@@ -144,6 +146,9 @@ class Image
 				$qr->rotate($deg);
 			}
 			$qr = $qr->getImage();
+			$tiltSide = $this->getRandomTiltSide();
+			$tilt = rand($this->maxTilt, 100) / 100;
+			$qr = $this->perspective($qr, $tilt, $tiltSide);
 			$width = imagesx($qr);
 			$height = imagesy($qr);
 			$coordinates = $this->getRandomCoordinates(true, $width, $height);
