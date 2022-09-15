@@ -59,11 +59,11 @@ class ImageGenerator
 		for ($i = 0; $i < $amount; $i++) {
 			$image = null;
 			if ($i < $amount / 3) {
-				$image = new Image(416, 768, $this->getRandomColor(), $this->getBackground());
+				$image = new Image(1024, 1024, $this->getRandomColor(), $this->getBackground());
 			} elseif ($i < $amount / 3 * 2) {
-				$image = new Image(624, 1152, $this->getRandomColor(), $this->getBackground());
+				$image = new Image(864, 864, $this->getRandomColor(), $this->getBackground());
 			} else {
-				$image = new Image(832, 1536, $this->getRandomColor(), $this->getBackground());
+				$image = new Image(768, 768, $this->getRandomColor(), $this->getBackground());
 			}
 			$image->addFigures($this->amountOfFigures);
 			$image->drawFigures();
