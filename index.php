@@ -7,7 +7,7 @@ use Volochaev\ImageGeneration\Config\ConfigLoader;
 use Volochaev\ImageGeneration\ImageGenerator;
 use Volochaev\ImageGeneration\Logging\Logger;
 
-$logger = Logger::getInstance('file');
+$logger = Logger::getInstance('console');
 
 $logger->setAccept(['ERROR', 'INFO', 'WARN']);
 
@@ -20,7 +20,7 @@ setConfig();
 
 try {
 	$image = new ImageGenerator();
-	$image->generateDataset(30);
+	$image->generateDataset();
 } finally {
 	configReturn($originalLocale);
 }

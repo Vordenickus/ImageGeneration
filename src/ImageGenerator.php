@@ -34,6 +34,8 @@ class ImageGenerator
 	protected $cleadDir;
 	protected $logger;
 
+	protected const OUTPUT_DIR = __DIR__ . '/../dataset/';
+
 
 	public function __construct()
 	{
@@ -91,6 +93,8 @@ class ImageGenerator
 		$elapsed = round(microtime(true) - $now, 2);
 
 		$this->logger->info("Генерация завершена за $elapsed s" . PHP_EOL);
+
+		$this->validateDataset();
 	}
 
 
@@ -160,6 +164,23 @@ class ImageGenerator
 		$this->logger->warn('Нарушена файловая структура, нет папки для бэкграундов. Восстановление' . PHP_EOL);
 		return mkdir(__DIR__ . '/../backgrounds/');
 	}
+
+
+	private function validateDataset()
+	{
+		$dir = static::OUTPUT_DIR;
+		$shift = 4;
+		$files = scandir($dir);
+		$count = count($files) - $shift;
+		$delta = $this->amountOfImages * 2 - $count;
+		if ($delta === 0) {
+			$this->logger->info("Все изображения сгенерированы");
+		} else {
+			$delta = $delta / 2;
+			$this->logger->info("Не сгенерировано $delta изображений");
+		}
+	}
+
 
 	private function loadBackgrounds()
 	{
